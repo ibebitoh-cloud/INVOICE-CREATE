@@ -1,16 +1,18 @@
 
 import React, { useRef, useState } from 'react';
-import { Eye, Search, Upload, RefreshCcw, FileText, Calendar, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { Eye, Search, Upload, RefreshCcw, FileText, Calendar, ArrowRight, ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
 import { Invoice, BookingRow } from '../types';
+import { INITIAL_CSV_DATA } from '../constants';
 
 interface Props {
   invoices: Invoice[];
   onPreview: (invoice: Invoice) => void;
   onImport: (data: BookingRow[]) => void;
+  onClearAll: () => void;
   onLoadSample: () => void;
 }
 
-const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onLoadSample }) => {
+const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClearAll, onLoadSample }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [usedInvoiceIds, setUsedInvoiceIds] = useState<Set<string>>(new Set());
   const [showStatementTool, setShowStatementTool] = useState(false);
@@ -33,6 +35,18 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onLoadS
   const handlePreview = (inv: Invoice) => {
     setUsedInvoiceIds(prev => new Set(prev).add(inv.id));
     onPreview(inv);
+  };
+
+  const handleDownloadSample = () => {
+    const blob = new Blob([INITIAL_CSV_DATA], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'nile-fleet-sample-operations.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const generateStatement = () => {
@@ -128,6 +142,14 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onLoadS
               accept=".csv" 
               onChange={handleFileChange} 
             />
+
+            <button 
+              onClick={handleDownloadSample}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold rounded-lg transition-colors border border-slate-200"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Sample CSV</span>
+            </button>
             
             <button 
               onClick={() => setShowStatementTool(!showStatementTool)}
@@ -144,6 +166,14 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onLoadS
             >
               <RefreshCcw className="w-4 h-4" />
               <span>Reset Sample</span>
+            </button>
+
+            <button 
+              onClick={onClearAll}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold rounded-lg transition-colors border border-red-200"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Remove All</span>
             </button>
           </div>
         </div>

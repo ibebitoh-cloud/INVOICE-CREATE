@@ -129,6 +129,12 @@ const App: React.FC = () => {
     updateCustomerSettings(data);
   };
 
+  const handleClearAll = () => {
+    if (confirm('Are you sure you want to remove all booking operations?')) {
+      setBookings([]);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
@@ -188,6 +194,7 @@ const App: React.FC = () => {
               invoices={invoices} 
               onPreview={(inv) => setSelectedInvoice(inv)}
               onImport={handleImportCSV}
+              onClearAll={handleClearAll}
               onLoadSample={() => {
                 const parsed = parseCSV(INITIAL_CSV_DATA);
                 handleImportCSV(parsed);
