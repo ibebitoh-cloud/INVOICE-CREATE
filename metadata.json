@@ -1,0 +1,5 @@
+{
+  "name": "Nile Fleet Invoice Management",
+  "description": "A comprehensive invoice generation system for logistics companies, featuring automated grouping by booking number, multiple invoice themes, and custom company branding.",
+  "requestFramePermissions": []
+}
