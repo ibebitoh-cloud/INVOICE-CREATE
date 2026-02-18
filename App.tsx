@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   FileText, 
@@ -26,6 +25,7 @@ const App: React.FC = () => {
   const [customerSettings, setCustomerSettings] = useState<Record<string, CustomerSettings>>({});
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
     name: 'NILE FLEET',
+    subName: 'GENSET',
     address: '123 Cairo Logistics Hub, Nile Delta, Egypt',
     email: 'billing@nilefleet.com',
     phone: '+20 123 456 7890',

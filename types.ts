@@ -1,4 +1,3 @@
-
 export interface BookingRow {
   Customer: string;
   BookingNo: string;
@@ -20,6 +19,7 @@ export interface CustomerSettings {
 
 export interface CompanyInfo {
   name: string;
+  subName: string;
   address: string;
   email: string;
   phone: string;

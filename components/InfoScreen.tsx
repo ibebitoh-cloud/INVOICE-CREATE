@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Upload, Trash2, Building2, ShieldCheck } from 'lucide-react';
 import { CompanyInfo } from '../types';
@@ -40,14 +39,26 @@ const InfoScreen: React.FC<Props> = ({ info, onUpdate }) => {
               General Profile
             </h3>
             <div className="grid grid-cols-1 gap-4">
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-700">Company Name</label>
-                <input 
-                  type="text" 
-                  value={info.name}
-                  onChange={(e) => onUpdate({ name: e.target.value })}
-                  className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-slate-700">Company Name</label>
+                  <input 
+                    type="text" 
+                    value={info.name}
+                    onChange={(e) => onUpdate({ name: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-slate-700">Company Sub-Name</label>
+                  <input 
+                    type="text" 
+                    value={info.subName}
+                    onChange={(e) => onUpdate({ subName: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    placeholder="e.g. GENSET"
+                  />
+                </div>
               </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-slate-700">Full Address</label>
