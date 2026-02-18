@@ -13,6 +13,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     switch (theme) {
       case 'dark': return "bg-white text-slate-900 font-sans";
       case 'elegant': return "bg-white text-slate-800 font-serif";
+      case 'modern-serif': return "bg-white text-slate-900 font-serif";
       case 'industrial': return "bg-white text-slate-900 font-mono uppercase";
       case 'bold': return "bg-white text-slate-900 font-sans";
       case 'grid': return "bg-white text-slate-900 font-mono";
@@ -32,6 +33,24 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     const titleText = invoice.isStatement ? 'STATEMENT OF ACCOUNT' : 'INVOICE';
 
     switch (theme) {
+      case 'modern-serif':
+        return (
+          <div className="flex justify-between items-center mb-12 border-b-2 border-slate-900 pb-8">
+            <div className="flex flex-col gap-2">
+              {company.logo && <img src={company.logo} className="h-32 w-auto mb-2" />}
+              <div className="text-4xl font-bold tracking-tight text-slate-900">{company.name}</div>
+              <div className="text-[10px] tracking-[0.4em] text-slate-500 uppercase font-black">Professional Logistics Solutions</div>
+            </div>
+            <div className="text-right">
+              <h1 className="text-4xl font-black tracking-tight mb-2 text-slate-900">{titleText}</h1>
+              <div className="text-sm font-bold text-slate-500 uppercase tracking-widest">NO: <span className="text-slate-900">{invoice.serialNumber}</span></div>
+              <div className="mt-4 flex flex-col items-end gap-1">
+                 <div className="text-[10px] font-black uppercase text-slate-400">Transaction Date</div>
+                 <div className="text-sm font-bold">{invoice.date}</div>
+              </div>
+            </div>
+          </div>
+        );
       case 'bold':
         return (
           <div className="flex justify-between items-start mb-12 border-b-8 border-blue-600 pb-8">
@@ -112,6 +131,20 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     const periodValue = invoice.isStatement ? invoice.period : invoice.bookingNo;
 
     switch (theme) {
+      case 'modern-serif':
+        return (
+          <div className="grid grid-cols-2 gap-12 mb-12">
+            <div className="border-l-4 border-slate-900 pl-6">
+              <h4 className="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest">Bill To</h4>
+              <p className="text-2xl font-bold text-slate-900 uppercase leading-tight">{invoice.customer}</p>
+              <p className="text-xs text-slate-400 mt-2">Valued Partner Account</p>
+            </div>
+            <div className="bg-slate-50 p-6 flex flex-col justify-center border border-slate-100">
+               <h4 className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">{periodLabel}</h4>
+               <p className="text-xl font-bold text-slate-900 uppercase tracking-tight">{periodValue}</p>
+            </div>
+          </div>
+        );
       case 'bold':
         return (
           <div className="flex gap-10 mb-12">
@@ -197,6 +230,9 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       theadClass = "bg-blue-600 text-white text-[11px] font-black uppercase tracking-widest";
       tdClass = "px-4 py-6 border-b-4 border-slate-900";
       rateClass = "text-right text-xl font-black bg-yellow-400 text-slate-900 px-2";
+    } else if (theme === 'modern-serif') {
+      theadClass = "bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em]";
+      tdClass = "px-4 py-4 border-b border-slate-200 font-medium";
     } else if (theme === 'elegant') {
       theadClass = "bg-white text-amber-700 font-bold uppercase text-[9px] tracking-[0.3em] border-y-2 border-amber-100";
       tdClass = "px-4 py-6 italic border-b border-amber-50";
@@ -234,16 +270,15 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 <th className={thClass}>Unit / Booking</th>
                 <th className={thClass}>Route / Transit</th>
                 <th className={thClass}>Shipper</th>
+                <th className={thClass}>Trucker</th>
                 <th className={`${thClass} text-right`}>Rate</th>
               </tr>
             </thead>
             <tbody>
-              {/* Fix: Explicitly type the map parameter to resolve 'unknown' type errors for items and total properties */}
               {Object.entries(groups).map(([routeKey, group]: [string, { items: BookingRow[], total: number }], gIdx) => (
                 <React.Fragment key={routeKey}>
-                  {/* Group Header - Optional but helpful for visual grouping */}
                   <tr className="bg-slate-50/50">
-                    <td colSpan={5} className="px-4 py-2 border-b-2 border-slate-900 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50/30">
+                    <td colSpan={6} className="px-4 py-2 border-b-2 border-slate-900 text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50/30">
                       Route: {routeKey}
                     </td>
                   </tr>
@@ -264,24 +299,25 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                         </div>
                       </td>
                       <td className={tdClass}>
-                        <div className="opacity-70 text-[10px]">{item.Shipper || '---'}</div>
+                        <div className="opacity-70 text-[10px] uppercase font-bold">{item.Shipper || '---'}</div>
+                      </td>
+                      <td className={tdClass}>
+                        <div className="opacity-70 text-[10px] font-black uppercase text-blue-800">{item.Trucker || '---'}</div>
                       </td>
                       <td className={`${tdClass} ${rateClass}`}>
                         {item.Rate.toLocaleString()} <span className="text-[10px] opacity-40">EGP</span>
                       </td>
                     </tr>
                   ))}
-                  {/* Group Subtotal Row */}
                   <tr className="bg-slate-100/30">
-                    <td colSpan={4} className="px-4 py-3 text-right font-black uppercase text-[10px] tracking-widest text-slate-400">
+                    <td colSpan={5} className="px-4 py-3 text-right font-black uppercase text-[10px] tracking-widest text-slate-400">
                       Subtotal for {routeKey}:
                     </td>
                     <td className={`${rateClass} px-4 py-3 border-b-4 border-slate-900 bg-slate-100/50`}>
                       {group.total.toLocaleString()} <span className="text-[10px] opacity-40">EGP</span>
                     </td>
                   </tr>
-                  {/* Bold separation spacing */}
-                  <tr className="h-4"><td colSpan={5}></td></tr>
+                  <tr className="h-4"><td colSpan={6}></td></tr>
                 </React.Fragment>
               ))}
             </tbody>
@@ -299,6 +335,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
               <th className={thClass}>Unit / Booking</th>
               <th className={thClass}>Route</th>
               <th className={thClass}>Shipper</th>
+              <th className={thClass}>Trucker</th>
               <th className={`${thClass} text-right`}>Rate</th>
             </tr>
           </thead>
@@ -320,7 +357,10 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                   </div>
                 </td>
                 <td className={tdClass}>
-                  <div className="opacity-70 text-[10px]">{item.Shipper || '---'}</div>
+                  <div className="opacity-70 text-[10px] uppercase font-bold">{item.Shipper || '---'}</div>
+                </td>
+                <td className={tdClass}>
+                  <div className="opacity-70 text-[10px] font-black uppercase text-blue-800">{item.Trucker || '---'}</div>
                 </td>
                 <td className={`${tdClass} ${rateClass}`}>
                   {item.Rate.toLocaleString()} <span className="text-[10px] opacity-40">EGP</span>
@@ -339,6 +379,8 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
     if (theme === 'bold') {
       totalBoxClass = "p-10 bg-blue-600 text-white border-8 border-slate-900 w-96";
+    } else if (theme === 'modern-serif') {
+      totalBoxClass = "p-8 bg-slate-900 text-white w-80 border-l-8 border-slate-400";
     } else if (theme === 'elegant') {
       totalBoxClass = "p-8 border-2 border-amber-200 text-amber-900 w-80 text-center italic";
     } else if (theme === 'industrial') {

@@ -75,9 +75,10 @@ ONE WAY EGYPT,EDK260544,DFTU1019409,ALEX,ALEX,,,2000,2026-02-12
 ONE WAY EGYPT,EDK260544,DFTU1007882,ALEX,ALEX,,,2000,2026-02-12`;
 
 export const THEMES = [
+  { id: 'modern-serif', name: 'Professional Serif' },
   { id: 'minimal', name: 'Modern Minimal' },
   { id: 'corporate', name: 'Professional Corporate' },
-  { id: 'elegant', name: 'Elegant Serif' },
+  { id: 'elegant', name: 'Elegant (Italic)' },
   { id: 'bold', name: 'Bold Geometric' },
   { id: 'dark', name: 'Dark Mode' },
   { id: 'grid', name: 'Tech Grid' },

@@ -14,7 +14,7 @@
             print-color-adjust: exact !important;
         }
         
-        /* A4 Page Styling */
+        /* A4 Page Styling for Web Preview */
         .invoice-container {
             background: white;
             width: 210mm;
@@ -32,6 +32,9 @@
                 transform: scale(0.9);
                 transform-origin: top center;
             }
+            .print-only {
+                display: none !important;
+            }
         }
 
         @media print {
@@ -43,17 +46,27 @@
                 width: 210mm;
                 height: 297mm;
                 background: white !important;
+                margin: 0;
+                padding: 0;
             }
+            
+            /* Hide the root app and any no-print marked items */
             #root, .no-print { 
                 display: none !important; 
             }
+            
+            /* Show only the print container */
             .print-only { 
                 display: block !important; 
+                visibility: visible !important;
                 position: absolute;
                 top: 0;
                 left: 0;
-                width: 100%;
+                width: 210mm;
+                height: 297mm;
+                background: white;
             }
+
             .invoice-container {
                 width: 210mm;
                 height: 297mm;
@@ -62,7 +75,8 @@
                 box-shadow: none !important;
                 border: none !important;
             }
-            /* Force background colors to show */
+            
+            /* Force background colors and images in PDFs */
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;

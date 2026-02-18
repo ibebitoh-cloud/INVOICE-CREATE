@@ -1,6 +1,6 @@
 
-import React, { useRef, useState } from 'react';
-import { Eye, Search, Upload, RefreshCcw, FileText, Calendar, ArrowRight, ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
+import React, { useRef, useState, useMemo } from 'react';
+import { Eye, Search, Upload, RefreshCcw, FileText, Calendar, ArrowRight, ChevronDown, ChevronUp, Download, Trash2, Filter } from 'lucide-react';
 import { Invoice, BookingRow } from '../types.ts';
 import { INITIAL_CSV_DATA } from '../constants.tsx';
 
@@ -18,6 +18,7 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
   const [showStatementTool, setShowStatementTool] = useState(false);
   const [statementForm, setStatementForm] = useState({
     customer: '',
+    shipper: '',
     dateFrom: '',
     dateTo: ''
   });
@@ -30,7 +31,20 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
     inv.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const uniqueCustomers = Array.from(new Set(invoices.map(inv => inv.customer)));
+  const uniqueCustomers = useMemo(() => Array.from(new Set(invoices.map(inv => inv.customer))), [invoices]);
+
+  const uniqueShippersForCustomer = useMemo(() => {
+    if (!statementForm.customer) return [];
+    const shippers = new Set<string>();
+    invoices
+      .filter(inv => inv.customer === statementForm.customer)
+      .forEach(inv => {
+        inv.items.forEach(item => {
+          if (item.Shipper) shippers.add(item.Shipper);
+        });
+      });
+    return Array.from(shippers).sort();
+  }, [invoices, statementForm.customer]);
 
   const handlePreview = (inv: Invoice) => {
     setUsedInvoiceIds(prev => new Set(prev).add(inv.id));
@@ -61,7 +75,10 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
           const from = statementForm.dateFrom ? new Date(statementForm.dateFrom) : null;
           const to = statementForm.dateTo ? new Date(statementForm.dateTo) : null;
           
-          if ((!from || itemDate >= from) && (!to || itemDate <= to)) {
+          const dateMatch = (!from || itemDate >= from) && (!to || itemDate <= to);
+          const shipperMatch = !statementForm.shipper || item.Shipper === statementForm.shipper;
+          
+          if (dateMatch && shipperMatch) {
             allMatchingBookings.push(item);
           }
         });
@@ -72,11 +89,13 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
       return;
     }
 
-    const statementPeriod = `${statementForm.dateFrom || 'Start'} to ${statementForm.dateTo || 'End'}`;
+    const datePart = `${statementForm.dateFrom || 'Start'} to ${statementForm.dateTo || 'End'}`;
+    const shipperPart = statementForm.shipper ? ` | Shipper: ${statementForm.shipper}` : '';
+    const statementPeriod = `${datePart}${shipperPart}`;
     
     const statementInvoice: Invoice = {
       id: `statement-${statementForm.customer}-${Date.now()}`,
-      bookingNo: "MULTIPLE",
+      bookingNo: statementForm.shipper || "MULTIPLE",
       customer: statementForm.customer,
       date: new Date().toISOString().split('T')[0],
       dueDate: "On Receipt",
@@ -197,20 +216,35 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
             </div>
             <div>
               <h3 className="font-bold text-slate-900">Generate Customer Statement</h3>
-              <p className="text-xs text-slate-500">Combine all operations for a specific client into one document</p>
+              <p className="text-xs text-slate-500">Combine all operations for a specific client and shipper into one document</p>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Customer</label>
               <select 
                 className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 value={statementForm.customer}
-                onChange={(e) => setStatementForm({...statementForm, customer: e.target.value})}
+                onChange={(e) => setStatementForm({...statementForm, customer: e.target.value, shipper: ''})}
               >
                 <option value="">Choose a customer...</option>
                 {uniqueCustomers.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <Filter className="w-3 h-3" />
+                Shipper Filter
+              </label>
+              <select 
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-400"
+                value={statementForm.shipper}
+                disabled={!statementForm.customer}
+                onChange={(e) => setStatementForm({...statementForm, shipper: e.target.value})}
+              >
+                <option value="">All Shippers</option>
+                {uniqueShippersForCustomer.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div className="space-y-1">
@@ -236,7 +270,7 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
               disabled={!statementForm.customer}
               className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
-              <span>Preview Statement</span>
+              <span>Preview</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

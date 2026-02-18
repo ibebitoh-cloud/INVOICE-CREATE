@@ -36,6 +36,7 @@ export type InvoiceTheme =
   | 'minimal' 
   | 'corporate' 
   | 'elegant' 
+  | 'modern-serif'
   | 'bold' 
   | 'dark' 
   | 'grid' 
