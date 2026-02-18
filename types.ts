@@ -30,6 +30,10 @@ export interface CompanyInfo {
   logo: string | null;
   signature: string | null;
   watermark: string | null;
+  // Positioning fields
+  signatureXOffset: number;
+  signatureYOffset: number;
+  signatureScale: number;
 }
 
 export type InvoiceTheme = 

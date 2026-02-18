@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, Trash2, Building2, ShieldCheck } from 'lucide-react';
+import { Upload, Trash2, Building2, ShieldCheck, Move } from 'lucide-react';
 import { CompanyInfo } from '../types';
 
 interface Props {
@@ -156,13 +156,66 @@ const InfoScreen: React.FC<Props> = ({ info, onUpdate }) => {
               onClear={() => removeFile('logo')}
             />
 
-            <AssetUpload 
-              label="Digital Signature"
-              value={info.signature}
-              onUpload={(e) => handleFileUpload('signature', e)}
-              onClear={() => removeFile('signature')}
-              isSignature
-            />
+            <div className="space-y-4">
+              <AssetUpload 
+                label="Digital Signature"
+                value={info.signature}
+                onUpload={(e) => handleFileUpload('signature', e)}
+                onClear={() => removeFile('signature')}
+                isSignature
+              />
+              
+              {info.signature && (
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Move className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-black text-slate-700 uppercase tracking-widest">Adjust Signature Position</span>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                        <span>Horizontal (X)</span>
+                        <span>{info.signatureXOffset}px</span>
+                      </div>
+                      <input 
+                        type="range" min="-100" max="100" 
+                        value={info.signatureXOffset}
+                        onChange={(e) => onUpdate({ signatureXOffset: parseInt(e.target.value) })}
+                        className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                        <span>Vertical (Y)</span>
+                        <span>{info.signatureYOffset}px</span>
+                      </div>
+                      <input 
+                        type="range" min="-100" max="100" 
+                        value={info.signatureYOffset}
+                        onChange={(e) => onUpdate({ signatureYOffset: parseInt(e.target.value) })}
+                        className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-black uppercase text-slate-400">
+                        <span>Scale</span>
+                        <span>{Math.round(info.signatureScale * 100)}%</span>
+                      </div>
+                      <input 
+                        type="range" min="0.5" max="2" step="0.1"
+                        value={info.signatureScale}
+                        onChange={(e) => onUpdate({ signatureScale: parseFloat(e.target.value) })}
+                        className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-400 italic">Positioning is relative to the Authorized Details block on the invoice.</p>
+                </div>
+              )}
+            </div>
 
             <AssetUpload 
               label="Invoice Watermark"
@@ -192,7 +245,7 @@ const AssetUpload: React.FC<{
           <img 
             src={value} 
             alt={label} 
-            className={`${isSignature ? 'h-40' : 'h-20'} w-full rounded border bg-slate-50 object-contain p-2`} 
+            className={`${isSignature ? 'h-32' : 'h-20'} w-full rounded border bg-slate-50 object-contain p-2`} 
           />
           <button 
             onClick={onClear}
@@ -202,7 +255,7 @@ const AssetUpload: React.FC<{
           </button>
         </div>
       ) : (
-        <label className={`${isSignature ? 'h-40' : 'h-20'} flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-400 transition-all`}>
+        <label className={`${isSignature ? 'h-32' : 'h-20'} flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 hover:border-blue-400 transition-all`}>
           <Upload className="w-5 h-5 text-slate-400 mb-1" />
           <span className="text-xs text-slate-500">Upload Image</span>
           <input type="file" className="hidden" accept="image/*" onChange={onUpload} />

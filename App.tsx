@@ -35,7 +35,10 @@ const App: React.FC = () => {
     authEmail: 'ops@nilefleet.com',
     logo: null,
     signature: null,
-    watermark: null
+    watermark: null,
+    signatureXOffset: 0,
+    signatureYOffset: 0,
+    signatureScale: 1
   });
   
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
