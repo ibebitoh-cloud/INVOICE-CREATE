@@ -1,5 +1,5 @@
 
-import { BookingRow } from './types';
+import { BookingRow } from './types.ts';
 
 export const INITIAL_CSV_DATA = `Customer,Booking No,Unit Number,Port Go,Port Gi,Trucker,Shipper,Rate,Date
 ARK,EG00002635,SEGU9327631,SOKHNA,SOKHNA,AMEN,LOUTS,3500,2026-02-09

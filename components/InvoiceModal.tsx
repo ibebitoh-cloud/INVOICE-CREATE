@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { X, Printer, Download } from 'lucide-react';
-import { Invoice, InvoiceTheme, CompanyInfo } from '../types';
-import InvoiceRenderer from './InvoiceRenderer';
+import { Invoice, InvoiceTheme, CompanyInfo } from '../types.ts';
+import InvoiceRenderer from './InvoiceRenderer.tsx';
 
 interface Props {
   invoice: Invoice;
@@ -19,7 +19,6 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm no-print">
       <div className="bg-white w-full max-w-5xl h-[95vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        {/* Modal Header */}
         <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-4">
             <h3 className="text-lg font-bold text-slate-800">Preview Invoice</h3>
@@ -51,7 +50,6 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
           </div>
         </div>
 
-        {/* Modal Body */}
         <div className="flex-1 overflow-y-auto bg-slate-100 py-8 px-4 flex justify-center items-start">
            <div className="invoice-preview-scale shadow-2xl">
               <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
@@ -59,7 +57,6 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
         </div>
       </div>
 
-      {/* Hidden Print Wrapper */}
       <div className="print-only hidden">
         <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
       </div>

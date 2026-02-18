@@ -1,8 +1,8 @@
 
 import React, { useRef, useState } from 'react';
 import { Eye, Search, Upload, RefreshCcw, FileText, Calendar, ArrowRight, ChevronDown, ChevronUp, Download, Trash2 } from 'lucide-react';
-import { Invoice, BookingRow } from '../types';
-import { INITIAL_CSV_DATA } from '../constants';
+import { Invoice, BookingRow } from '../types.ts';
+import { INITIAL_CSV_DATA } from '../constants.tsx';
 
 interface Props {
   invoices: Invoice[];
@@ -52,7 +52,6 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
   const generateStatement = () => {
     if (!statementForm.customer) return;
 
-    // Collect all raw bookings for this customer (across all grouped invoices)
     const allMatchingBookings: BookingRow[] = [];
     invoices
       .filter(inv => inv.customer === statementForm.customer)
@@ -190,7 +189,6 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
         </div>
       </div>
 
-      {/* Statement Generator Panel */}
       {showStatementTool && (
         <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl animate-in fade-in slide-in-from-top-4 duration-300">
           <div className="flex items-center gap-3 mb-4">

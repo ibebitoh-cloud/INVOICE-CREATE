@@ -13,12 +13,12 @@ import {
   Building2,
   Info
 } from 'lucide-react';
-import { BookingRow, CustomerSettings, CompanyInfo, Invoice, InvoiceTheme } from './types';
-import { INITIAL_CSV_DATA, THEMES } from './constants';
-import BookingScreen from './components/BookingScreen';
-import CustomerScreen from './components/CustomerScreen';
-import InfoScreen from './components/InfoScreen';
-import InvoiceModal from './components/InvoiceModal';
+import { BookingRow, CustomerSettings, CompanyInfo, Invoice, InvoiceTheme } from './types.ts';
+import { INITIAL_CSV_DATA, THEMES } from './constants.tsx';
+import BookingScreen from './components/BookingScreen.tsx';
+import CustomerScreen from './components/CustomerScreen.tsx';
+import InfoScreen from './components/InfoScreen.tsx';
+import InvoiceModal from './components/InvoiceModal.tsx';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'bookings' | 'customers' | 'info'>('bookings');
@@ -70,7 +70,7 @@ const App: React.FC = () => {
     const uniqueCustomers = Array.from(new Set(rows.map(p => p.Customer)));
     setCustomerSettings(prev => {
       const next = { ...prev };
-      uniqueCustomers.forEach((c, idx) => {
+      uniqueCustomers.forEach((c) => {
         if (!next[c]) {
           next[c] = {
             name: c,
@@ -137,7 +137,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Sidebar */}
       <nav className="w-full md:w-64 bg-slate-900 text-white p-6 space-y-8 no-print shrink-0">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-blue-600 rounded-lg">
@@ -186,7 +185,6 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="flex-1 bg-slate-50 p-4 md:p-8 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           {activeTab === 'bookings' && (
@@ -216,7 +214,6 @@ const App: React.FC = () => {
         </div>
       </main>
 
-      {/* Invoice Modal */}
       {selectedInvoice && (
         <InvoiceModal 
           invoice={selectedInvoice} 
