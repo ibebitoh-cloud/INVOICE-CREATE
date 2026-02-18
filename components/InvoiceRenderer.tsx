@@ -127,11 +127,11 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                <div className="flex justify-between gap-6">
                   <div className="flex-1">
                     <div className="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest">Manifest Ref</div>
-                    <div font-bold text-slate-900 truncate text-xs>{periodValue}</div>
+                    <div className="font-bold text-slate-900 truncate text-xs">{periodValue}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-[8px] font-black text-red-400 uppercase mb-1 tracking-widest">Payment Deadline</div>
-                    <div font-black text-red-600 text-xs>{invoice.dueDate}</div>
+                    <div className="font-black text-red-600 text-xs">{invoice.dueDate}</div>
                   </div>
                </div>
             </div>
@@ -193,54 +193,57 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
   const renderTable = () => {
     let theadClass = "bg-slate-50 border-y border-slate-200";
-    let thClass = "px-3 py-3 text-left text-[9px] font-black uppercase tracking-widest text-slate-500";
-    let tdClass = "px-3 py-3 border-b border-slate-100 text-[11px]";
+    let thClass = "px-2 py-3 text-left text-[9px] font-black uppercase tracking-widest text-slate-500";
+    let tdClass = "px-2 py-3 border-b border-slate-100 text-[11px]";
     
     if (theme === 'ledger-pro') {
       theadClass = "bg-slate-900 text-white";
-      thClass = "px-3 py-3 text-left font-black text-[10px] uppercase tracking-widest";
-      tdClass = "px-3 py-4 border-b border-slate-100 text-[12px] font-bold text-slate-800";
+      thClass = "px-2 py-3 text-left font-black text-[10px] uppercase tracking-widest";
+      tdClass = "px-2 py-4 border-b border-slate-100 text-[12px] font-bold text-slate-800";
     } else if (theme === 'industrial') {
       theadClass = "bg-black text-white";
-      thClass = "px-3 py-2 text-left font-black text-[10px] tracking-tight";
-      tdClass = "px-3 py-2 border-2 border-black text-sm font-black";
+      thClass = "px-2 py-2 text-left font-black text-[10px] tracking-tight";
+      tdClass = "px-2 py-2 border-2 border-black text-sm font-black";
     } else if (theme === 'soft') {
       theadClass = "bg-indigo-50/50";
-      thClass = "px-4 py-3 text-left font-black text-[9px] text-indigo-400 tracking-[0.2em]";
-      tdClass = "px-4 py-4 border-b border-indigo-50/50 text-[12px] font-medium text-slate-600";
+      thClass = "px-3 py-3 text-left font-black text-[9px] text-indigo-400 tracking-[0.2em]";
+      tdClass = "px-3 py-4 border-b border-indigo-50/50 text-[12px] font-medium text-slate-600";
     }
 
     return (
       <div className="mb-8 flex-1 overflow-hidden">
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse table-fixed">
           <thead className={theadClass}>
             <tr>
-              <th className={thClass}>Date</th>
-              <th className={thClass}>Unit & Booking</th>
-              <th className={thClass}>Route</th>
-              <th className={thClass}>Shipper</th>
-              <th className={`${thClass} text-right`}>Service Rate</th>
+              <th className={`${thClass} w-[12%]`}>Date</th>
+              <th className={`${thClass} w-[18%]`}>Unit</th>
+              <th className={`${thClass} w-[20%]`}>Route</th>
+              <th className={`${thClass} w-[18%]`}>Shipper</th>
+              <th className={`${thClass} w-[15%]`}>Trucker</th>
+              <th className={`${thClass} text-right w-[17%]`}>Rate</th>
             </tr>
           </thead>
           <tbody>
             {invoice.items.map((item, i) => (
               <tr key={i} className={`${theme === 'soft' ? 'hover:bg-indigo-50/30' : 'hover:bg-slate-50'} transition-colors`}>
                 <td className={tdClass}>
-                   <div className="font-bold opacity-60">{item.Date}</div>
+                   <div className="font-bold opacity-60 truncate">{item.Date}</div>
                 </td>
                 <td className={tdClass}>
-                  <div className="font-black text-slate-900">{item.UnitNumber}</div>
-                  <div className="text-[8px] font-black text-blue-500 uppercase tracking-widest mt-0.5">{item.BookingNo}</div>
+                  <div className="font-black text-slate-900 truncate">{item.UnitNumber}</div>
                 </td>
                 <td className={tdClass}>
-                   <div className="flex items-center gap-2">
-                      <span className="font-bold opacity-50">{item.PortGo}</span>
-                      <span className="text-blue-500 text-[9px] font-black">→</span>
-                      <span className="font-bold text-slate-900">{item.PortGi}</span>
+                   <div className="flex items-center gap-1 overflow-hidden">
+                      <span className="font-bold opacity-50 truncate">{item.PortGo}</span>
+                      <span className="text-blue-500 text-[9px] font-black shrink-0">→</span>
+                      <span className="font-bold text-slate-900 truncate">{item.PortGi}</span>
                    </div>
                 </td>
                 <td className={tdClass}>
-                  <div className="uppercase font-bold text-slate-500">{item.Shipper || '-'}</div>
+                  <div className="uppercase font-bold text-slate-500 truncate">{item.Shipper || '-'}</div>
+                </td>
+                <td className={tdClass}>
+                  <div className="uppercase font-bold text-slate-700 truncate">{item.Trucker || '-'}</div>
                 </td>
                 <td className={`${tdClass} text-right font-black text-slate-900`}>
                   {item.Rate.toLocaleString()} <span className="text-[9px] font-bold opacity-30">EGP</span>

@@ -179,7 +179,7 @@ const InfoScreen: React.FC<Props> = ({ info, onUpdate }) => {
                         <span>{info.signatureXOffset}px</span>
                       </div>
                       <input 
-                        type="range" min="-100" max="100" 
+                        type="range" min="-200" max="200" 
                         value={info.signatureXOffset}
                         onChange={(e) => onUpdate({ signatureXOffset: parseInt(e.target.value) })}
                         className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
@@ -192,7 +192,7 @@ const InfoScreen: React.FC<Props> = ({ info, onUpdate }) => {
                         <span>{info.signatureYOffset}px</span>
                       </div>
                       <input 
-                        type="range" min="-100" max="100" 
+                        type="range" min="-200" max="200" 
                         value={info.signatureYOffset}
                         onChange={(e) => onUpdate({ signatureYOffset: parseInt(e.target.value) })}
                         className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
