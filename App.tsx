@@ -185,7 +185,7 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      <main className="flex-1 bg-slate-50 p-4 md:p-8 overflow-y-auto">
+      <main className="flex-1 bg-slate-50 p-4 md:p-8 overflow-y-auto no-print">
         <div className="max-w-6xl mx-auto">
           {activeTab === 'bookings' && (
             <BookingScreen 
