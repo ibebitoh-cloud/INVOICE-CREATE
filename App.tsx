@@ -197,6 +197,8 @@ const App: React.FC = () => {
                 const parsed = parseCSV(INITIAL_CSV_DATA);
                 handleImportCSV(parsed);
               }}
+              company={companyInfo}
+              theme={selectedTheme}
             />
           )}
           {activeTab === 'customers' && (
