@@ -1,8 +1,10 @@
 
-import React, { useEffect } from 'react';
-import { X, Printer, Download } from 'lucide-react';
+import React, { useEffect, useState, useRef } from 'react';
+import { X, Printer, Download, Loader2 } from 'lucide-react';
 import { Invoice, InvoiceTheme, CompanyInfo } from '../types.ts';
 import InvoiceRenderer from './InvoiceRenderer.tsx';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface Props {
   invoice: Invoice;
@@ -12,22 +14,65 @@ interface Props {
 }
 
 const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  // Handle browser printing
   const handlePrint = () => {
-    // Save original title
     const originalTitle = document.title;
-    
-    // Set title to invoice number so the PDF filename is correct in the browser dialog
     const safeCustomer = invoice.customer.replace(/[^a-z0-9]/gi, '_');
     document.title = `${invoice.serialNumber}_${safeCustomer}`;
     
-    // Small delay to ensure title update is registered before the print dialog freezes the thread
     setTimeout(() => {
       window.print();
-      // Restore title after a short delay (dialog blocks execution, so this runs after close)
       setTimeout(() => {
         document.title = originalTitle;
       }, 500);
     }, 50);
+  };
+
+  // Handle PDF generation using html2canvas and jsPDF
+  const handleDownloadPDF = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+
+    try {
+      // Use the off-screen high-resolution element for capturing
+      const element = printRef.current;
+      if (!element) throw new Error("Print source not found");
+
+      // Small delay to ensure all assets (logo, signature) are rendered
+      await new Promise(resolve => setTimeout(resolve, 600));
+
+      const canvas = await html2canvas(element, {
+        scale: 3, // High DPI for professional print quality
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: 794, // Standard A4 width at 96 DPI
+        height: 1123, // Standard A4 height at 96 DPI
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
+      const safeCustomer = invoice.customer.replace(/[^a-z0-9]/gi, '_');
+      pdf.save(`${invoice.serialNumber}_${safeCustomer}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Automatic download failed. Please use the Print button and select "Save as PDF" as a fallback.');
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // Close on Escape key
@@ -41,7 +86,7 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
 
   return (
     <>
-      {/* SCREEN UI - This entire block is hidden during printing via .no-print */}
+      {/* SCREEN UI - User facing preview modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm no-print">
         <div className="bg-white w-full max-w-5xl h-[95vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
           {/* Modal Header */}
@@ -56,22 +101,29 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
               <button 
                 onClick={handlePrint}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors flex items-center gap-2 px-4 border border-slate-200"
-                title="Print standard copy"
+                disabled={isDownloading}
               >
                 <Printer className="w-5 h-5" />
                 <span className="hidden md:inline font-medium">Print</span>
               </button>
               <button 
-                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 px-4 shadow-lg shadow-blue-500/20 font-bold"
-                onClick={handlePrint}
-                title="Save as PDF (Use 'Save as PDF' in the print dialog)"
+                onClick={handleDownloadPDF}
+                disabled={isDownloading}
+                className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 px-4 shadow-lg shadow-blue-500/20 font-bold disabled:bg-blue-400 min-w-[160px] justify-center"
               >
-                <Download className="w-5 h-5" />
-                <span className="hidden md:inline text-sm">Download PDF</span>
+                {isDownloading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Download className="w-5 h-5" />
+                )}
+                <span className="hidden md:inline text-sm">
+                  {isDownloading ? 'Downloading...' : 'Download PDF'}
+                </span>
               </button>
               <button 
                 onClick={onClose}
                 className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors ml-2"
+                disabled={isDownloading}
               >
                 <X className="w-6 h-6" />
               </button>
@@ -84,19 +136,21 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
                 <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
              </div>
           </div>
-          
-          <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs text-slate-500 font-medium">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              A4 Printing Ready
-            </div>
-            <span>Use "Save as PDF" to download file named: {invoice.serialNumber}.pdf</span>
-          </div>
         </div>
       </div>
 
-      {/* PRINT AREA - Visible only when printing via .print-only styles in index.html */}
-      <div className="print-only">
+      {/* PRINT SOURCE - Off-screen high quality element for html2canvas */}
+      <div 
+        ref={printRef} 
+        className="bg-white"
+        style={{ 
+          width: '794px', 
+          minHeight: '1123px', 
+          position: 'absolute', 
+          left: '-9999px', 
+          top: 0 
+        }}
+      >
         <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
       </div>
     </>

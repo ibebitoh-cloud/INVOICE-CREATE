@@ -45,14 +45,13 @@
             }
             html, body {
                 width: 210mm;
-                height: auto;
+                height: 297mm;
                 background: white !important;
                 margin: 0;
                 padding: 0;
-                overflow: visible !important;
+                overflow: hidden !important;
             }
             
-            /* DO NOT hide #root as the print content is inside it */
             #root { 
                 display: block !important; 
             }
@@ -61,7 +60,6 @@
                 display: none !important; 
             }
             
-            /* Show only the print container */
             .print-only { 
                 display: block !important; 
                 visibility: visible !important;
@@ -69,21 +67,25 @@
                 top: 0;
                 left: 0;
                 width: 210mm;
-                height: auto;
+                height: 297mm;
                 background: white;
                 z-index: 9999;
+                overflow: hidden !important;
             }
 
             .invoice-container {
                 width: 210mm;
-                min-height: 297mm;
+                height: 297mm;
                 margin: 0;
-                padding: 15mm;
+                padding: 10mm !important;
                 box-shadow: none !important;
                 border: none !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                page-break-after: avoid;
             }
             
-            /* Force background colors and images in PDFs */
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -97,6 +99,8 @@
     "react-dom": "https://esm.sh/react-dom@19.0.0",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
     "lucide-react": "https://esm.sh/lucide-react@0.475.0?deps=react@19.0.0",
+    "html2canvas": "https://esm.sh/html2canvas@1.4.1",
+    "jspdf": "https://esm.sh/jspdf@2.5.1",
     "react/": "https://esm.sh/react@^19.2.4/",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
   }
