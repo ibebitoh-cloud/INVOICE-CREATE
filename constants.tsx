@@ -75,6 +75,7 @@ ONE WAY EGYPT,EDK260544,DFTU1019409,ALEX,ALEX,,,2000,2026-02-12
 ONE WAY EGYPT,EDK260544,DFTU1007882,ALEX,ALEX,,,2000,2026-02-12`;
 
 export const THEMES = [
+  { id: 'ledger-pro', name: 'Executive Ledger' },
   { id: 'modern-serif', name: 'Professional Serif' },
   { id: 'minimal', name: 'Modern Minimal' },
   { id: 'corporate', name: 'Professional Corporate' },
