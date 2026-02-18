@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { X, Printer, Download, Loader2 } from 'lucide-react';
 import { Invoice, InvoiceTheme, CompanyInfo } from '../types.ts';
@@ -86,9 +85,17 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
 
   return (
     <>
-      {/* SCREEN UI - User facing preview modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm no-print">
-        <div className="bg-white w-full max-w-5xl h-[95vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      {/* 
+        The root container must NOT have no-print. 
+        Instead, we use internal no-print blocks for screen elements 
+        and print-only blocks for the physical paper content.
+      */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-4 pointer-events-none">
+        
+        {/* SCREEN UI - Backdrop and Controls (HIDDEN ON PRINT) */}
+        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm pointer-events-auto no-print" onClick={onClose} />
+        
+        <div className="relative bg-white w-full max-w-5xl h-full md:h-[95vh] md:rounded-2xl shadow-2xl overflow-hidden flex flex-col pointer-events-auto no-print">
           {/* Modal Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-4">
@@ -139,10 +146,21 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
         </div>
       </div>
 
-      {/* PRINT SOURCE - Off-screen high quality element for html2canvas */}
+      {/* 
+        NATIVE PRINT SOURCE - This div is invisible on screen but 
+        is the primary target for window.print()
+      */}
+      <div className="print-only">
+        <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
+      </div>
+
+      {/* 
+        PDF CAPTURE SOURCE - Off-screen high quality element for html2canvas.
+        It must remain absolute and off-screen to not affect layout.
+      */}
       <div 
         ref={printRef} 
-        className="bg-white"
+        className="bg-white no-print"
         style={{ 
           width: '794px', 
           minHeight: '1123px', 

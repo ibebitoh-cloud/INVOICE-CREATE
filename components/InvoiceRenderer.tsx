@@ -277,67 +277,71 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     }
 
     const totalSection = (
-      <div className={`${totalBoxClass} shrink-0`}>
+      <div className={`${totalBoxClass} h-full`}>
          <div className="text-left">
-            <div className={`text-[11px] font-black uppercase mb-1 tracking-widest ${isDark ? 'text-blue-200' : 'text-slate-400'}`}>Cumulative Total Payable</div>
-            <div className="text-2xl font-black italic opacity-60">EGYPTIAN POUNDS (EGP)</div>
+            <div className={`text-[10px] font-black uppercase mb-0.5 tracking-widest ${isDark ? 'text-blue-200' : 'text-slate-400'}`}>Total Payable</div>
+            <div className="text-[14px] font-black italic opacity-60">EGP</div>
          </div>
          <div className="text-right">
-            <div className="text-7xl font-black tabular-nums tracking-tighter">{invoice.total.toLocaleString()}</div>
+            <div className="text-5xl font-black tabular-nums tracking-tighter">{invoice.total.toLocaleString()}</div>
          </div>
       </div>
     );
 
     return (
-      <div className="mt-auto flex flex-col gap-10">
-        {/* Total (Rate) Section on far right */}
-        <div className="flex justify-end">
-          <div className="w-full md:w-[450px]">
+      <div className="mt-auto flex flex-col gap-8">
+        {/* Row 1: Settlement and Rate side by side */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          {/* Settlement Instructions */}
+          <div className={`p-6 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border-l-8 border-l-blue-600 rounded-r-2xl shadow-sm h-full`}>
+            <h5 className={`text-[11px] font-black uppercase mb-3 tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Settlement Instructions</h5>
+            <p className="text-[12px] leading-relaxed opacity-80 font-medium">
+              Official payment required before <span className="font-black text-red-600 underline decoration-2 underline-offset-4">{invoice.dueDate}</span>. 
+              Remit to Nile Fleet quoting <span className="font-bold bg-white px-2 py-0.5 rounded border border-slate-200">{invoice.serialNumber}</span>.
+              After receiving the booking within week the invoice is final if no edits required from your side.
+            </p>
+          </div>
+          {/* Rate Box */}
+          <div className="h-full">
             {totalSection}
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-12 items-start">
-          {/* Settlement Instructions */}
-          <div className="flex-1">
-             <div className={`p-6 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border-l-8 border-l-blue-600 rounded-r-2xl shadow-sm`}>
-                <h5 className={`text-[11px] font-black uppercase mb-3 tracking-widest ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Settlement Instructions</h5>
-                <p className="text-[12px] leading-relaxed opacity-80 font-medium">
-                  Official payment is required before <span className="font-black text-red-600 underline decoration-2 underline-offset-4">{invoice.dueDate}</span>. 
-                  Direct transfers to Nile Fleet are mandatory. Document reference <span className="font-bold bg-white px-2 py-0.5 rounded border border-slate-200">{invoice.serialNumber}</span> 
-                  must be quoted in all remittance details for successful verification.
-                </p>
-             </div>
-          </div>
-          
-          {/* My Info / Signature Section next to instructions */}
-          <div className="flex-1 flex items-center justify-end gap-10 pr-4">
-             {company.signature && (
-               <div className="shrink-0 relative">
-                 <img 
-                   src={company.signature} 
-                   className={`h-40 w-auto mix-blend-multiply object-contain opacity-95 -rotate-2 scale-110 drop-shadow-md ${isDark ? 'brightness-200 invert grayscale' : 'grayscale'}`} 
-                   alt="Signature" 
-                 />
-                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-slate-900/10 rounded-full" />
+        {/* Row 2: Info and Signature Aligned Next to Each Other */}
+        <div className="flex flex-col md:flex-row items-end gap-6 md:gap-12">
+          {/* My Info */}
+          <div className={`border-l-4 pl-6 flex flex-col justify-center ${isDark ? 'border-blue-500' : 'border-slate-900'} shrink-0`}>
+            <p className={`text-2xl font-black uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>{company.authName}</p>
+            <p className="text-sm font-black text-blue-500 uppercase tracking-[0.2em] mt-2">{company.authJobTitle}</p>
+            
+            <div className="mt-4 text-[10px] font-bold text-slate-400 uppercase flex flex-col gap-1.5 items-start leading-tight">
+               <div className="flex items-center gap-2">
+                 <span className="opacity-50 font-black min-w-[32px]">LOC:</span>
+                 <span className="text-slate-600">{company.address}</span>
                </div>
-             )}
-             
-             <div className={`border-l-4 pl-6 flex flex-col justify-center ${isDark ? 'border-blue-500' : 'border-slate-900'}`}>
-                <p className={`text-2xl font-black uppercase leading-none ${isDark ? 'text-white' : 'text-slate-900'}`}>{company.authName}</p>
-                <p className="text-sm font-black text-blue-500 uppercase tracking-[0.2em] mt-2">{company.authJobTitle}</p>
-                
-                <div className="mt-4 text-[10px] font-bold text-slate-400 uppercase flex flex-col gap-1 items-start leading-tight">
-                   <div className="flex items-center gap-2">
-                     <span className="opacity-50 font-black">LOC:</span>
-                     <span className="text-slate-600">{company.address}</span>
-                   </div>
-                   <div className="flex items-center gap-2">
-                     <span className="opacity-50 font-black">NET:</span>
-                     <span className="text-slate-600">{company.email} • {company.phone}</span>
-                   </div>
-                </div>
-             </div>
+               <div className="flex items-center gap-2">
+                 <span className="opacity-50 font-black min-w-[32px]">MAIL:</span>
+                 <span className="text-slate-600">{company.email}</span>
+               </div>
+               <div className="flex items-center gap-2">
+                 <span className="opacity-50 font-black min-w-[32px]">MOB:</span>
+                 <span className="text-slate-600">{company.phone}</span>
+               </div>
+            </div>
+          </div>
+
+          {/* Signature Next to Info - Scaled to match info block height */}
+          <div className="flex items-end pb-2">
+            {company.signature && (
+              <div className="relative">
+                <img 
+                  src={company.signature} 
+                  className={`h-32 w-auto mix-blend-multiply object-contain opacity-95 transition-transform drop-shadow-sm ${isDark ? 'brightness-200 invert grayscale' : 'grayscale'}`} 
+                  alt="Signature" 
+                />
+                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4/5 h-0.5 bg-slate-900/10 rounded-full" />
+              </div>
+            )}
           </div>
         </div>
 
