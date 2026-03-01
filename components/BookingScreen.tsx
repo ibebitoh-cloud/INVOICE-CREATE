@@ -17,7 +17,9 @@ import {
   CheckSquare,
   Square,
   Loader2,
-  FileCheck
+  FileCheck,
+  Plus,
+  X
 } from 'lucide-react';
 import { Invoice, BookingRow, CompanyInfo, InvoiceTheme } from '../types.ts';
 import { INITIAL_CSV_DATA } from '../constants.tsx';
@@ -31,17 +33,32 @@ interface Props {
   onImport: (data: BookingRow[]) => void;
   onClearAll: () => void;
   onLoadSample: () => void;
+  onAddBooking: (booking: BookingRow) => void;
   // We need company info and current theme for batch rendering
   company: CompanyInfo;
   theme: InvoiceTheme;
 }
 
-const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClearAll, onLoadSample, company, theme }) => {
+const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClearAll, onLoadSample, onAddBooking, company, theme }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [usedInvoiceIds, setUsedInvoiceIds] = useState<Set<string>>(new Set());
   const [showStatementTool, setShowStatementTool] = useState(false);
   const [showBatchTool, setShowBatchTool] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   
+  // New Booking Form State
+  const [newBooking, setNewBooking] = useState<BookingRow>({
+    Customer: '',
+    BookingNo: '',
+    UnitNumber: '',
+    PortGo: '',
+    PortGi: '',
+    Trucker: '',
+    Shipper: '',
+    Rate: 0,
+    Date: new Date().toISOString().split('T')[0]
+  });
+
   // Batch processing state
   const [batchCustomer, setBatchCustomer] = useState('');
   const [isProcessingBatch, setIsProcessingBatch] = useState(false);
@@ -64,6 +81,27 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
   );
 
   const uniqueCustomers = useMemo(() => Array.from(new Set(invoices.map(inv => inv.customer))), [invoices]);
+
+  const handleAddSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newBooking.Customer || !newBooking.BookingNo) {
+      alert("Customer and Booking Number are required.");
+      return;
+    }
+    onAddBooking(newBooking);
+    setShowAddModal(false);
+    setNewBooking({
+      Customer: '',
+      BookingNo: '',
+      UnitNumber: '',
+      PortGo: '',
+      PortGi: '',
+      Trucker: '',
+      Shipper: '',
+      Rate: 0,
+      Date: new Date().toISOString().split('T')[0]
+    });
+  };
 
   const batchInvoices = useMemo(() => {
     if (!batchCustomer) return [];
@@ -120,12 +158,12 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
         if (!element) continue;
 
         const canvas = await html2canvas(element, {
-          scale: 2.5,
+          scale: 3,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          width: 794,
-          height: 1123,
+          windowWidth: element.scrollWidth,
+          windowHeight: element.scrollHeight,
         });
 
         const imgData = canvas.toDataURL('image/png');
@@ -222,6 +260,139 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
 
   return (
     <div className="space-y-6">
+      {/* Add Operation Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-[110] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">New Operation</h3>
+              </div>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddSubmit} className="p-8 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Customer Name</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. GLOBAL LOGISTICS"
+                    value={newBooking.Customer}
+                    onChange={(e) => setNewBooking({...newBooking, Customer: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Booking Number</label>
+                  <input 
+                    required
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. BK-9928"
+                    value={newBooking.BookingNo}
+                    onChange={(e) => setNewBooking({...newBooking, BookingNo: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Container / Unit #</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. MSKU-123456"
+                    value={newBooking.UnitNumber}
+                    onChange={(e) => setNewBooking({...newBooking, UnitNumber: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Shipper</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. MAERSK"
+                    value={newBooking.Shipper}
+                    onChange={(e) => setNewBooking({...newBooking, Shipper: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Trucker</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. NILE EXPRESS"
+                    value={newBooking.Trucker}
+                    onChange={(e) => setNewBooking({...newBooking, Trucker: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Rate (EGP)</label>
+                  <input 
+                    type="number" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    value={newBooking.Rate}
+                    onChange={(e) => setNewBooking({...newBooking, Rate: parseFloat(e.target.value) || 0})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Port Out (Go)</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. CAIRO"
+                    value={newBooking.PortGo}
+                    onChange={(e) => setNewBooking({...newBooking, PortGo: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Port In (Gi)</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    placeholder="e.g. ALEXANDRIA"
+                    value={newBooking.PortGi}
+                    onChange={(e) => setNewBooking({...newBooking, PortGi: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Operation Date</label>
+                  <input 
+                    type="date" 
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
+                    value={newBooking.Date}
+                    onChange={(e) => setNewBooking({...newBooking, Date: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-6 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black uppercase tracking-widest rounded-xl transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-[2] py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-500/20 transition-all"
+                >
+                  Create Operation
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Batch Processing Overlay */}
       {isProcessingBatch && (
         <div className="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-md flex items-center justify-center p-6">
@@ -257,8 +428,8 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
         ref={batchRenderRef} 
         className="bg-white"
         style={{ 
-          width: '794px', 
-          height: '1123px', 
+          width: '210mm', 
+          minHeight: '297mm', 
           position: 'absolute', 
           left: '-9999px', 
           top: 0 
@@ -281,6 +452,14 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
           </div>
           
           <div className="flex flex-wrap gap-2">
+            <button 
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm shadow-emerald-500/20"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add Operation</span>
+            </button>
+
             <button 
               onClick={() => fileInputRef.current?.click()}
               className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors shadow-sm shadow-blue-500/20"

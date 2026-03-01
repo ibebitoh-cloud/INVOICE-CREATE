@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { X, Printer, Download, Loader2 } from 'lucide-react';
+import { X, Printer, Download, Loader2, Edit3, Check } from 'lucide-react';
 import { Invoice, InvoiceTheme, CompanyInfo } from '../types.ts';
 import InvoiceRenderer from './InvoiceRenderer.tsx';
 import html2canvas from 'html2canvas';
@@ -9,12 +9,25 @@ interface Props {
   invoice: Invoice;
   theme: InvoiceTheme;
   company: CompanyInfo;
+  onUpdateSerial: (newSerial: string) => void;
   onClose: () => void;
 }
 
-const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => {
+const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onUpdateSerial, onClose }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isEditingSerial, setIsEditingSerial] = useState(false);
+  const [tempSerial, setTempSerial] = useState(invoice.serialNumber);
   const printRef = useRef<HTMLDivElement>(null);
+
+  // Sync tempSerial when invoice changes
+  useEffect(() => {
+    setTempSerial(invoice.serialNumber);
+  }, [invoice.serialNumber]);
+
+  const handleSaveSerial = () => {
+    onUpdateSerial(tempSerial);
+    setIsEditingSerial(false);
+  };
 
   // Handle browser printing
   const handlePrint = () => {
@@ -44,12 +57,12 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
       await new Promise(resolve => setTimeout(resolve, 600));
 
       const canvas = await html2canvas(element, {
-        scale: 3, // High DPI for professional print quality
+        scale: 3,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        width: 794, // Standard A4 width at 96 DPI
-        height: 1123, // Standard A4 height at 96 DPI
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -99,7 +112,46 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
           {/* Modal Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-4">
-              <h3 className="text-lg font-bold text-slate-800">Preview Invoice</h3>
+              <div className="flex flex-col">
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Previewing Document</h3>
+                {isEditingSerial ? (
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="text" 
+                      value={tempSerial}
+                      onChange={(e) => setTempSerial(e.target.value)}
+                      className="bg-slate-50 border border-blue-200 px-2 py-1 rounded text-sm font-bold text-blue-600 outline-none focus:ring-2 focus:ring-blue-500"
+                      autoFocus
+                    />
+                    <button 
+                      onClick={handleSaveSerial}
+                      className="bg-blue-600 text-white p-1 rounded hover:bg-blue-700 transition-colors"
+                    >
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setTempSerial(invoice.serialNumber);
+                        setIsEditingSerial(false);
+                      }}
+                      className="bg-slate-200 text-slate-600 p-1 rounded hover:bg-slate-300 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 group">
+                    <span className="text-lg font-black text-slate-800 leading-none">{invoice.serialNumber}</span>
+                    <button 
+                      onClick={() => setIsEditingSerial(true)}
+                      className="p-1 text-slate-300 hover:text-blue-600 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Edit Serial Number"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+              </div>
               <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider border border-blue-100">
                 A4 Format • {theme}
               </span>
@@ -162,8 +214,8 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onClose }) => 
         ref={printRef} 
         className="bg-white no-print"
         style={{ 
-          width: '794px', 
-          minHeight: '1123px', 
+          width: '210mm', 
+          minHeight: '297mm', 
           position: 'absolute', 
           left: '-9999px', 
           top: 0 

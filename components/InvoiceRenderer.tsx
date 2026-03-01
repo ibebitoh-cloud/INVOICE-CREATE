@@ -127,7 +127,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                <div className="flex justify-between gap-6">
                   <div className="flex-1">
                     <div className="text-[8px] font-black text-slate-400 uppercase mb-1 tracking-widest">Manifest Ref</div>
-                    <div className="font-bold text-slate-900 truncate text-xs">{periodValue}</div>
+                    <div className="font-bold text-slate-900 text-xs">{periodValue}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-[8px] font-black text-red-400 uppercase mb-1 tracking-widest">Payment Deadline</div>
@@ -147,7 +147,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
             <div className="col-span-5 p-4 bg-yellow-400 flex flex-col justify-between">
               <div>
                 <div className="text-[9px] font-black mb-0.5 opacity-60">LOG_REF_ID</div>
-                <div className="text-[10px] font-black truncate">{periodValue}</div>
+                <div className="text-[10px] font-black">{periodValue}</div>
               </div>
               <div className="pt-2 border-t border-black/10">
                 <div className="text-[9px] font-black opacity-60">DUE_THRESHOLD</div>
@@ -211,8 +211,8 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     }
 
     return (
-      <div className="mb-8 flex-1 overflow-hidden">
-        <table className="w-full border-collapse table-fixed">
+      <div className="mb-8 flex-1">
+        <table className="w-full border-collapse">
           <thead className={theadClass}>
             <tr>
               <th className={`${thClass} w-[12%]`}>Date</th>
@@ -227,23 +227,23 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
             {invoice.items.map((item, i) => (
               <tr key={i} className={`${theme === 'soft' ? 'hover:bg-indigo-50/30' : 'hover:bg-slate-50'} transition-colors`}>
                 <td className={tdClass}>
-                   <div className="font-bold opacity-60 truncate">{item.Date}</div>
+                   <div className="font-bold opacity-60">{item.Date}</div>
                 </td>
                 <td className={tdClass}>
-                  <div className="font-black text-slate-900 truncate">{item.UnitNumber}</div>
+                  <div className="font-black text-slate-900">{item.UnitNumber}</div>
                 </td>
                 <td className={tdClass}>
-                   <div className="flex items-center gap-1 overflow-hidden">
-                      <span className="font-bold opacity-50 truncate">{item.PortGo}</span>
+                   <div className="flex items-center gap-1">
+                      <span className="font-bold opacity-50">{item.PortGo}</span>
                       <span className="text-blue-500 text-[9px] font-black shrink-0">→</span>
-                      <span className="font-bold text-slate-900 truncate">{item.PortGi}</span>
+                      <span className="font-bold text-slate-900">{item.PortGi}</span>
                    </div>
                 </td>
                 <td className={tdClass}>
-                  <div className="uppercase font-bold text-slate-500 truncate">{item.Shipper || '-'}</div>
+                  <div className="uppercase font-bold text-slate-500">{item.Shipper || '-'}</div>
                 </td>
                 <td className={tdClass}>
-                  <div className="uppercase font-bold text-slate-700 truncate">{item.Trucker || '-'}</div>
+                  <div className="uppercase font-bold text-slate-700">{item.Trucker || '-'}</div>
                 </td>
                 <td className={`${tdClass} text-right font-black text-slate-900`}>
                   {item.Rate.toLocaleString()} <span className="text-[9px] font-bold opacity-30">EGP</span>
@@ -412,7 +412,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
   };
 
   return (
-    <div className={`invoice-container relative shadow-2xl transition-all duration-700 overflow-hidden ${getThemeBaseStyles()}`}>
+    <div className={`invoice-container relative shadow-2xl transition-all duration-700 ${getThemeBaseStyles()}`}>
       {/* Background Watermark */}
       {company.watermark && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] pointer-events-none rotate-12 scale-[1.2]">

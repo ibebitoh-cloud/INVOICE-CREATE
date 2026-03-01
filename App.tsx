@@ -43,6 +43,7 @@ const App: React.FC = () => {
   
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<InvoiceTheme>('minimal');
+  const [invoiceOverrides, setInvoiceOverrides] = useState<Record<string, string>>({});
 
   const parseCSV = (csv: string): BookingRow[] => {
     const lines = csv.split('\n');
@@ -95,12 +96,21 @@ const App: React.FC = () => {
       groups[row.BookingNo].push(row);
     });
 
-    return Object.entries(groups).map(([bookingNo, items], index) => {
+    const sortedGroups = Object.entries(groups).sort((a, b) => {
+      const dateA = new Date(a[1][0].Date).getTime();
+      const dateB = new Date(b[1][0].Date).getTime();
+      if (dateA !== dateB) return dateA - dateB;
+      return a[0].localeCompare(b[0]);
+    });
+
+    return sortedGroups.map(([bookingNo, items], index) => {
       const customerName = items[0].Customer;
       const settings = customerSettings[customerName];
-      const serialNum = settings 
+      const override = invoiceOverrides[bookingNo];
+      
+      const serialNum = override || (settings 
         ? `${settings.serialPrefix}${settings.startingSerial + index}`
-        : `INV-${bookingNo}`;
+        : `INV-${bookingNo}`);
       
       const date = new Date(items[0].Date);
       const dueDate = new Date(date);
@@ -117,10 +127,20 @@ const App: React.FC = () => {
         total: items.reduce((sum, item) => sum + item.Rate, 0)
       } as Invoice;
     });
-  }, [bookings, customerSettings]);
+  }, [bookings, customerSettings, invoiceOverrides]);
 
   const handleUpdateCustomer = (name: string, settings: CustomerSettings) => {
     setCustomerSettings(prev => ({ ...prev, [name]: settings }));
+  };
+
+  const handleUpdateInvoiceSerial = (id: string, newSerial: string) => {
+    setInvoiceOverrides(prev => ({ ...prev, [id]: newSerial }));
+  };
+
+  const handleAddBooking = (newBooking: BookingRow) => {
+    const nextBookings = [...bookings, newBooking];
+    setBookings(nextBookings);
+    updateCustomerSettings(nextBookings);
   };
 
   const handleUpdateInfo = (info: Partial<CompanyInfo>) => {
@@ -196,6 +216,7 @@ const App: React.FC = () => {
               onPreview={(inv) => setSelectedInvoice(inv)}
               onImport={handleImportCSV}
               onClearAll={handleClearAll}
+              onAddBooking={handleAddBooking}
               onLoadSample={() => {
                 const parsed = parseCSV(INITIAL_CSV_DATA);
                 handleImportCSV(parsed);
@@ -224,6 +245,7 @@ const App: React.FC = () => {
           invoice={selectedInvoice} 
           theme={selectedTheme} 
           company={companyInfo}
+          onUpdateSerial={(newSerial) => handleUpdateInvoiceSerial(selectedInvoice.bookingNo, newSerial)}
           onClose={() => setSelectedInvoice(null)} 
         />
       )}
