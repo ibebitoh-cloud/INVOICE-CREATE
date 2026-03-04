@@ -17,14 +17,16 @@ interface Props {
   settings: Record<string, CustomerSettings>;
   onUpdate: (name: string, settings: CustomerSettings) => void;
   globalSerialStart: string;
+  globalSerialPrefix: string;
   isGlobalMode: boolean;
-  onApplyGlobalSerial: (start: string) => void;
+  onApplyGlobalSerial: (start: string, prefix: string) => void;
   onToggleGlobalMode: () => void;
 }
 
-const CustomerScreen: React.FC<Props> = ({ settings, onUpdate, globalSerialStart, isGlobalMode, onApplyGlobalSerial, onToggleGlobalMode }) => {
+const CustomerScreen: React.FC<Props> = ({ settings, onUpdate, globalSerialStart, globalSerialPrefix, isGlobalMode, onApplyGlobalSerial, onToggleGlobalMode }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [localGlobalSerial, setLocalGlobalSerial] = useState(globalSerialStart);
+  const [localGlobalPrefix, setLocalGlobalPrefix] = useState(globalSerialPrefix);
   const customerList: CustomerSettings[] = Object.values(settings);
   
   const filteredCustomers = customerList.filter((c: CustomerSettings) => 
@@ -113,17 +115,27 @@ const CustomerScreen: React.FC<Props> = ({ settings, onUpdate, globalSerialStart
           <div className="flex flex-col sm:flex-row items-stretch gap-4 w-full md:w-auto">
             <div className="relative">
               <input 
+                type="text" 
+                value={localGlobalPrefix}
+                onChange={(e) => setLocalGlobalPrefix(e.target.value)}
+                className={`w-full sm:w-32 px-6 py-4 border rounded-2xl outline-none font-black text-xl transition-all placeholder:text-white/20 ${isGlobalMode ? 'bg-white/20 border-white/30 text-white focus:ring-white/20' : 'bg-white/10 border-white/20 text-white focus:ring-blue-500/20 focus:border-blue-500'}`}
+                placeholder="INV-"
+              />
+              <div className={`absolute -top-2.5 left-4 px-2 text-[9px] font-black uppercase tracking-widest ${isGlobalMode ? 'bg-blue-600 text-white' : 'bg-slate-900 text-blue-400'}`}>Prefix</div>
+            </div>
+            <div className="relative">
+              <input 
                 type="number" 
                 value={localGlobalSerial}
                 onChange={(e) => setLocalGlobalSerial(e.target.value)}
-                className={`w-full sm:w-48 px-6 py-4 border rounded-2xl outline-none font-black text-xl transition-all placeholder:text-white/20 ${isGlobalMode ? 'bg-white/20 border-white/30 text-white focus:ring-white/20' : 'bg-white/10 border-white/20 text-white focus:ring-blue-500/20 focus:border-blue-500'}`}
+                className={`w-full sm:w-40 px-6 py-4 border rounded-2xl outline-none font-black text-xl transition-all placeholder:text-white/20 ${isGlobalMode ? 'bg-white/20 border-white/30 text-white focus:ring-white/20' : 'bg-white/10 border-white/20 text-white focus:ring-blue-500/20 focus:border-blue-500'}`}
                 placeholder="1001"
               />
               <div className={`absolute -top-2.5 left-4 px-2 text-[9px] font-black uppercase tracking-widest ${isGlobalMode ? 'bg-blue-600 text-white' : 'bg-slate-900 text-blue-400'}`}>Start From</div>
             </div>
             <div className="flex flex-col gap-2">
               <button 
-                onClick={() => onApplyGlobalSerial(localGlobalSerial)}
+                onClick={() => onApplyGlobalSerial(localGlobalSerial, localGlobalPrefix)}
                 className={`px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isGlobalMode ? 'bg-white text-blue-600 hover:bg-blue-50' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'}`}
               >
                 <ShieldCheck className="w-5 h-5" />

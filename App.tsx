@@ -45,6 +45,7 @@ const App: React.FC = () => {
   const [selectedTheme, setSelectedTheme] = useState<InvoiceTheme>('minimal');
   const [invoiceOverrides, setInvoiceOverrides] = useState<Record<string, string>>({});
   const [globalSerialStart, setGlobalSerialStart] = useState<string>('1000');
+  const [globalSerialPrefix, setGlobalSerialPrefix] = useState<string>('INV-');
   const [isGlobalMode, setIsGlobalMode] = useState<boolean>(false);
 
   const parseCSV = (csv: string): BookingRow[] => {
@@ -111,7 +112,7 @@ const App: React.FC = () => {
       const override = invoiceOverrides[bookingNo];
       
       const baseSerial = isGlobalMode 
-        ? (parseInt(globalSerialStart) + index).toString()
+        ? `${globalSerialPrefix}${parseInt(globalSerialStart) + index}`
         : (settings 
           ? `${settings.serialPrefix}${settings.startingSerial + index}`
           : `INV-${bookingNo}`);
@@ -143,8 +144,9 @@ const App: React.FC = () => {
     setInvoiceOverrides(prev => ({ ...prev, [id]: newSerial }));
   };
 
-  const handleApplyGlobalSerial = (startNum: string) => {
+  const handleApplyGlobalSerial = (startNum: string, prefix: string) => {
     setGlobalSerialStart(startNum);
+    setGlobalSerialPrefix(prefix);
     setIsGlobalMode(true);
     // Clear overrides when switching to global mode to ensure "AUTO FILL" consistency
     setInvoiceOverrides({});
@@ -243,6 +245,7 @@ const App: React.FC = () => {
               settings={customerSettings} 
               onUpdate={handleUpdateCustomer} 
               globalSerialStart={globalSerialStart}
+              globalSerialPrefix={globalSerialPrefix}
               isGlobalMode={isGlobalMode}
               onApplyGlobalSerial={handleApplyGlobalSerial}
               onToggleGlobalMode={() => setIsGlobalMode(!isGlobalMode)}
