@@ -134,7 +134,7 @@ const App: React.FC = () => {
         total: items.reduce((sum, item) => sum + item.Rate, 0)
       } as Invoice;
     });
-  }, [bookings, customerSettings, invoiceOverrides, isGlobalMode, globalSerialStart, globalSerialPrefix]);
+  }, [bookings, customerSettings, invoiceOverrides]);
 
   const handleUpdateCustomer = (name: string, settings: CustomerSettings) => {
     setCustomerSettings(prev => ({ ...prev, [name]: settings }));
