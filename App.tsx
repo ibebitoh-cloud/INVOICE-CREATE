@@ -44,6 +44,8 @@ const App: React.FC = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<InvoiceTheme>('minimal');
   const [invoiceOverrides, setInvoiceOverrides] = useState<Record<string, string>>({});
+  const [globalSerialStart, setGlobalSerialStart] = useState<string>('1000');
+  const [isGlobalMode, setIsGlobalMode] = useState<boolean>(false);
 
   const parseCSV = (csv: string): BookingRow[] => {
     const lines = csv.split('\n');
@@ -108,9 +110,13 @@ const App: React.FC = () => {
       const settings = customerSettings[customerName];
       const override = invoiceOverrides[bookingNo];
       
-      const serialNum = override || (settings 
-        ? `${settings.serialPrefix}${settings.startingSerial + index}`
-        : `INV-${bookingNo}`);
+      const baseSerial = isGlobalMode 
+        ? (parseInt(globalSerialStart) + index).toString()
+        : (settings 
+          ? `${settings.serialPrefix}${settings.startingSerial + index}`
+          : `INV-${bookingNo}`);
+
+      const serialNum = override || baseSerial;
       
       const date = new Date(items[0].Date);
       const dueDate = new Date(date);
@@ -135,6 +141,13 @@ const App: React.FC = () => {
 
   const handleUpdateInvoiceSerial = (id: string, newSerial: string) => {
     setInvoiceOverrides(prev => ({ ...prev, [id]: newSerial }));
+  };
+
+  const handleApplyGlobalSerial = (startNum: string) => {
+    setGlobalSerialStart(startNum);
+    setIsGlobalMode(true);
+    // Clear overrides when switching to global mode to ensure "AUTO FILL" consistency
+    setInvoiceOverrides({});
   };
 
   const handleAddBooking = (newBooking: BookingRow) => {
@@ -229,6 +242,10 @@ const App: React.FC = () => {
             <CustomerScreen 
               settings={customerSettings} 
               onUpdate={handleUpdateCustomer} 
+              globalSerialStart={globalSerialStart}
+              isGlobalMode={isGlobalMode}
+              onApplyGlobalSerial={handleApplyGlobalSerial}
+              onToggleGlobalMode={() => setIsGlobalMode(!isGlobalMode)}
             />
           )}
           {activeTab === 'info' && (

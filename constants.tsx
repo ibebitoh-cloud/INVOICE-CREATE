@@ -87,4 +87,8 @@ export const THEMES = [
   { id: 'soft', name: 'Soft Pastels' },
   { id: 'industrial', name: 'Industrial' },
   { id: 'compact', name: 'Compact' },
+  { id: 'blueprint', name: 'Blueprint' },
+  { id: 'retro', name: 'Retro Typewriter' },
+  { id: 'minimalist-bold', name: 'Minimalist Bold' },
+  { id: 'executive', name: 'Global Executive' },
 ] as const;

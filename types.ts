@@ -48,7 +48,11 @@ export type InvoiceTheme =
   | 'classic' 
   | 'soft' 
   | 'industrial' 
-  | 'compact';
+  | 'compact'
+  | 'blueprint'
+  | 'retro'
+  | 'minimalist-bold'
+  | 'executive';
 
 export interface Invoice {
   id: string;

@@ -21,6 +21,10 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       case 'compact': return "bg-white text-slate-900 font-sans p-6 text-[11px]";
       case 'corporate': return "bg-white text-slate-800 font-sans p-10 border-t-[10px] border-blue-800";
       case 'classic': return "bg-white text-black font-serif p-10 border border-slate-200";
+      case 'blueprint': return "bg-[#002b5c] text-[#a5c9ff] font-mono p-10";
+      case 'retro': return "bg-[#f4ecd8] text-[#433422] font-['Special_Elite'] p-12";
+      case 'minimalist-bold': return "bg-white text-black font-sans p-12";
+      case 'executive': return "bg-[#fcfcfc] text-[#1a1a1a] font-['Outfit'] p-12";
       default: return "bg-white text-slate-900 font-sans p-10";
     }
   };
@@ -90,6 +94,62 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
             <div className="text-right">
               <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-1">Serial Tracking</div>
               <div className="text-2xl font-black text-indigo-600 tracking-tighter">{invoice.serialNumber}</div>
+            </div>
+          </div>
+        );
+      case 'blueprint':
+        return (
+          <div className="flex justify-between items-start mb-10 border-b-2 border-[#a5c9ff] pb-8">
+            <div className="space-y-2">
+              <div className="text-4xl font-bold tracking-tighter uppercase">{company.name}</div>
+              <div className="text-[10px] font-bold tracking-[0.3em] opacity-60">{company.subName}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-bold opacity-40 mb-1 uppercase tracking-[0.2em]">DWG_REF_NO</div>
+              <div className="text-3xl font-bold tracking-tighter">{invoice.serialNumber}</div>
+            </div>
+          </div>
+        );
+      case 'retro':
+        return (
+          <div className="flex flex-col items-center mb-12 border-b-2 border-[#433422]/20 pb-8 text-center">
+            <div className="text-4xl font-bold uppercase mb-2 tracking-widest">{company.name}</div>
+            <div className="text-xs font-bold opacity-60 mb-6">{company.subName}</div>
+            <div className="flex justify-between w-full text-left">
+              <div>
+                <div className="text-[10px] font-bold uppercase mb-1">Document #</div>
+                <div className="text-xl font-bold">{invoice.serialNumber}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] font-bold uppercase mb-1">Date Issued</div>
+                <div className="text-xl font-bold">{invoice.date}</div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'minimalist-bold':
+        return (
+          <div className="flex justify-between items-end mb-16">
+            <div>
+              <div className="text-6xl font-black leading-none tracking-tighter mb-2">{company.name}</div>
+              <div className="text-xs font-black uppercase tracking-[0.5em] text-slate-400">{company.subName}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs font-black uppercase tracking-widest mb-1">Invoice</div>
+              <div className="text-4xl font-black tracking-tighter">{invoice.serialNumber}</div>
+            </div>
+          </div>
+        );
+      case 'executive':
+        return (
+          <div className="flex justify-between items-center mb-12 bg-[#1a1a1a] text-white -mx-12 -mt-12 p-12">
+            <div>
+              <div className="text-4xl font-black tracking-tight mb-1 uppercase">{company.name}</div>
+              <div className="text-[10px] font-bold tracking-[0.4em] text-amber-400 uppercase">{company.subName}</div>
+            </div>
+            <div className="text-right border-l border-white/10 pl-12">
+              <div className="text-[10px] font-bold text-white/40 uppercase tracking-[0.3em] mb-2">Registry ID</div>
+              <div className="text-3xl font-light tracking-tighter text-amber-400">{invoice.serialNumber}</div>
             </div>
           </div>
         );
@@ -174,6 +234,65 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
             </div>
           </div>
         );
+      case 'blueprint':
+        return (
+          <div className="grid grid-cols-2 gap-8 mb-10 border-2 border-[#a5c9ff] p-6">
+            <div>
+              <div className="text-[10px] font-bold opacity-40 uppercase mb-2">CONTRACTOR_CLIENT</div>
+              <div className="text-2xl font-bold tracking-tight">{invoice.customer}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-bold opacity-40 uppercase mb-2">PROJECT_REF</div>
+              <div className="text-xl font-bold">{periodValue}</div>
+              <div className="text-[10px] font-bold text-[#ff6b6b] mt-2 uppercase">DUE: {invoice.dueDate}</div>
+            </div>
+          </div>
+        );
+      case 'retro':
+        return (
+          <div className="mb-10 border-2 border-[#433422] p-8 bg-[#433422]/5">
+            <div className="text-xs font-bold uppercase mb-4 opacity-40">Bill To:</div>
+            <div className="text-3xl font-bold mb-4">{invoice.customer}</div>
+            <div className="flex justify-between border-t border-[#433422]/20 pt-4">
+              <div>
+                <div className="text-[10px] font-bold uppercase opacity-40">Reference</div>
+                <div className="font-bold">{periodValue}</div>
+              </div>
+              <div className="text-right">
+                <div className="text-[10px] font-bold uppercase opacity-40">Due Date</div>
+                <div className="font-bold">{invoice.dueDate}</div>
+              </div>
+            </div>
+          </div>
+        );
+      case 'minimalist-bold':
+        return (
+          <div className="mb-12 border-t-8 border-black pt-8 flex justify-between items-start">
+            <div>
+              <div className="text-xs font-black uppercase tracking-widest mb-4">Client</div>
+              <div className="text-4xl font-black tracking-tighter">{invoice.customer}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-xs font-black uppercase tracking-widest mb-2">Reference</div>
+              <div className="text-xl font-black tracking-tighter">{periodValue}</div>
+              <div className="mt-4 text-xs font-black bg-black text-white px-3 py-1 uppercase tracking-widest">Due {invoice.dueDate}</div>
+            </div>
+          </div>
+        );
+      case 'executive':
+        return (
+          <div className="flex justify-between items-center mb-12 border-b border-slate-200 pb-12">
+            <div>
+              <div className="text-[10px] font-bold text-amber-600 uppercase tracking-[0.3em] mb-4">Account Holder</div>
+              <div className="text-4xl font-black tracking-tight text-slate-900 uppercase">{invoice.customer}</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mb-2">{periodLabel}</div>
+              <div className="text-xl font-bold text-slate-800 mb-4">{periodValue}</div>
+              <div className="text-[10px] font-bold text-white bg-slate-900 px-4 py-2 uppercase tracking-[0.2em]">Payable by {invoice.dueDate}</div>
+            </div>
+          </div>
+        );
       default:
         return (
           <div className="flex justify-between mb-8 items-center bg-slate-50 p-6 border border-slate-100 rounded-xl">
@@ -208,6 +327,22 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       theadClass = "bg-indigo-50/50";
       thClass = "px-3 py-3 text-left font-black text-[9px] text-indigo-400 tracking-[0.2em]";
       tdClass = "px-3 py-4 border-b border-indigo-50/50 text-[12px] font-medium text-slate-600";
+    } else if (theme === 'blueprint') {
+      theadClass = "border-y-2 border-[#a5c9ff]";
+      thClass = "px-2 py-2 text-left font-bold text-[10px] uppercase tracking-widest";
+      tdClass = "px-2 py-3 border-b border-[#a5c9ff]/20 text-[11px] font-bold";
+    } else if (theme === 'retro') {
+      theadClass = "border-y border-[#433422]";
+      thClass = "px-2 py-2 text-left font-bold text-[11px] uppercase";
+      tdClass = "px-2 py-3 border-b border-[#433422]/10 text-[13px]";
+    } else if (theme === 'minimalist-bold') {
+      theadClass = "bg-black text-white";
+      thClass = "px-4 py-4 text-left font-black text-[10px] uppercase tracking-widest";
+      tdClass = "px-4 py-4 border-b-2 border-slate-100 text-[13px] font-black";
+    } else if (theme === 'executive') {
+      theadClass = "bg-slate-50";
+      thClass = "px-4 py-4 text-left font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400";
+      tdClass = "px-4 py-5 border-b border-slate-100 text-[13px] font-bold text-slate-700";
     }
 
     return (
@@ -320,6 +455,39 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       </div>
     );
 
+    const blueprintTotal = (
+      <div className="border-4 border-[#a5c9ff] p-6 flex justify-between items-center w-full">
+        <div className="text-xl font-bold uppercase tracking-[0.2em]">TOTAL_PAYABLE_EGP</div>
+        <div className="text-6xl font-bold tracking-tighter">{invoice.total.toLocaleString()}</div>
+      </div>
+    );
+
+    const retroTotal = (
+      <div className="border-2 border-[#433422] p-6 flex justify-between items-center w-full bg-[#433422]/5">
+        <div className="text-xl font-bold uppercase underline">Total Amount Due:</div>
+        <div className="text-5xl font-bold">{invoice.total.toLocaleString()} EGP</div>
+      </div>
+    );
+
+    const minimalistTotal = (
+      <div className="border-y-8 border-black py-8 flex justify-between items-center w-full">
+        <div className="text-2xl font-black uppercase tracking-widest">Total</div>
+        <div className="text-7xl font-black tracking-tighter">{invoice.total.toLocaleString()}</div>
+      </div>
+    );
+
+    const executiveTotal = (
+      <div className="bg-[#1a1a1a] text-white p-10 flex justify-between items-center w-full">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-400 mb-2">Final Settlement Amount</div>
+          <div className="text-sm font-medium text-white/40 italic">All values in Egyptian Pounds</div>
+        </div>
+        <div className="text-6xl font-black tracking-tighter text-amber-400">
+          {invoice.total.toLocaleString()}
+        </div>
+      </div>
+    );
+
     const taglineSection = (
       <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col items-center shrink-0">
         <div className={`font-black text-sm tracking-[0.3em] uppercase ${isDark ? 'text-slate-400' : 'text-slate-900'}`}>NILE FLEET GENSET</div>
@@ -388,6 +556,56 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
              {taglineSection}
           </div>
         );
+      case 'blueprint':
+        return (
+          <div className="mt-auto pt-8 flex flex-col">
+            <div className="mb-8">{blueprintTotal}</div>
+            <div className="grid grid-cols-2 gap-8">
+              {settlementSection}
+              {authAndSignature}
+            </div>
+            {taglineSection}
+          </div>
+        );
+      case 'retro':
+        return (
+          <div className="mt-auto pt-8 flex flex-col">
+            <div className="mb-8">{retroTotal}</div>
+            <div className="grid grid-cols-2 gap-12 items-end">
+              <div className="space-y-6">
+                {settlementSection}
+                <div className="text-[10px] font-bold uppercase opacity-30">Certified Document // Nile Fleet</div>
+              </div>
+              {authAndSignature}
+            </div>
+            {taglineSection}
+          </div>
+        );
+      case 'minimalist-bold':
+        return (
+          <div className="mt-auto pt-12 flex flex-col">
+            <div className="mb-12">{minimalistTotal}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
+              {settlementSection}
+              {authAndSignature}
+            </div>
+            {taglineSection}
+          </div>
+        );
+      case 'executive':
+        return (
+          <div className="mt-auto pt-12 flex flex-col">
+            <div className="mb-12">{executiveTotal}</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
+              <div className="space-y-8">
+                {settlementSection}
+                <div className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.5em]">Verified Executive Document</div>
+              </div>
+              {authAndSignature}
+            </div>
+            {taglineSection}
+          </div>
+        );
       default:
         return (
           <div className="mt-auto pt-8 border-t-2 border-slate-100 flex flex-col">
@@ -422,7 +640,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
       {renderHeader()}
       {renderBillTo()}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0">
         {renderTable()}
       </div>
       <div className="mt-auto shrink-0">

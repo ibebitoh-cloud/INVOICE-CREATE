@@ -16,10 +16,15 @@ import { CustomerSettings } from '../types.ts';
 interface Props {
   settings: Record<string, CustomerSettings>;
   onUpdate: (name: string, settings: CustomerSettings) => void;
+  globalSerialStart: string;
+  isGlobalMode: boolean;
+  onApplyGlobalSerial: (start: string) => void;
+  onToggleGlobalMode: () => void;
 }
 
-const CustomerScreen: React.FC<Props> = ({ settings, onUpdate }) => {
+const CustomerScreen: React.FC<Props> = ({ settings, onUpdate, globalSerialStart, isGlobalMode, onApplyGlobalSerial, onToggleGlobalMode }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [localGlobalSerial, setLocalGlobalSerial] = useState(globalSerialStart);
   const customerList: CustomerSettings[] = Object.values(settings);
   
   const filteredCustomers = customerList.filter((c: CustomerSettings) => 
@@ -84,6 +89,55 @@ const CustomerScreen: React.FC<Props> = ({ settings, onUpdate }) => {
               {Math.round(customerList.reduce((acc: number, c: CustomerSettings) => acc + c.dueDateDays, 0) / (customerList.length || 1))}
             </div>
             <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg. Due Days</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Global Serial Numbering Section */}
+      <div className={`p-8 rounded-[2rem] shadow-2xl relative overflow-hidden transition-all duration-500 ${isGlobalMode ? 'bg-blue-600 text-white shadow-blue-600/20' : 'bg-slate-900 text-white shadow-slate-900/20'}`}>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-4 max-w-xl">
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isGlobalMode ? 'bg-white/20 text-white' : 'bg-blue-500/20 text-blue-400'}`}>
+              <Hash className="w-3 h-3" />
+              <span>{isGlobalMode ? 'Global Mode Active' : 'Global Sequencing'}</span>
+            </div>
+            <h3 className="text-3xl font-black tracking-tight">Global Invoice Numbering</h3>
+            <p className={`${isGlobalMode ? 'text-blue-50' : 'text-slate-400'} font-medium text-sm`}>
+              {isGlobalMode 
+                ? "The system is currently using a single sequential numbering sequence for all customers. New bookings will automatically follow this order."
+                : "Override all individual customer prefixes and starting numbers. This will assign a continuous sequential number to every booking in the system."}
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch gap-4 w-full md:w-auto">
+            <div className="relative">
+              <input 
+                type="number" 
+                value={localGlobalSerial}
+                onChange={(e) => setLocalGlobalSerial(e.target.value)}
+                className={`w-full sm:w-48 px-6 py-4 border rounded-2xl outline-none font-black text-xl transition-all placeholder:text-white/20 ${isGlobalMode ? 'bg-white/20 border-white/30 text-white focus:ring-white/20' : 'bg-white/10 border-white/20 text-white focus:ring-blue-500/20 focus:border-blue-500'}`}
+                placeholder="1001"
+              />
+              <div className={`absolute -top-2.5 left-4 px-2 text-[9px] font-black uppercase tracking-widest ${isGlobalMode ? 'bg-blue-600 text-white' : 'bg-slate-900 text-blue-400'}`}>Start From</div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={() => onApplyGlobalSerial(localGlobalSerial)}
+                className={`px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 ${isGlobalMode ? 'bg-white text-blue-600 hover:bg-blue-50' : 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'}`}
+              >
+                <ShieldCheck className="w-5 h-5" />
+                {isGlobalMode ? 'Update Sequence' : 'Apply Global Serial'}
+              </button>
+              {isGlobalMode && (
+                <button 
+                  onClick={onToggleGlobalMode}
+                  className="text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors"
+                >
+                  Switch back to Customer Prefixes
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
