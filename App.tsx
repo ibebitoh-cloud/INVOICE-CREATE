@@ -93,8 +93,15 @@ const App: React.FC = () => {
 
   // Group Bookings into Invoices
   const invoices = useMemo(() => {
+    const sortedBookings = [...bookings].sort((a, b) => {
+      const dateA = new Date(a.Date).getTime();
+      const dateB = new Date(b.Date).getTime();
+      if (dateA !== dateB) return dateA - dateB;
+      return a.UnitNumber.localeCompare(b.UnitNumber);
+    });
+
     const groups: Record<string, BookingRow[]> = {};
-    bookings.forEach(row => {
+    sortedBookings.forEach(row => {
       if (!groups[row.BookingNo]) groups[row.BookingNo] = [];
       groups[row.BookingNo].push(row);
     });
@@ -107,7 +114,15 @@ const App: React.FC = () => {
     });
 
     return sortedGroups.map(([bookingNo, items], index) => {
-      const customerName = items[0].Customer;
+      // Sort items within the invoice by date, then by unit number
+      const sortedItems = [...items].sort((a, b) => {
+        const dateA = new Date(a.Date).getTime();
+        const dateB = new Date(b.Date).getTime();
+        if (dateA !== dateB) return dateA - dateB;
+        return a.UnitNumber.localeCompare(b.UnitNumber);
+      });
+
+      const customerName = sortedItems[0].Customer;
       const settings = customerSettings[customerName];
       const override = invoiceOverrides[bookingNo];
       
@@ -119,7 +134,7 @@ const App: React.FC = () => {
 
       const serialNum = override || baseSerial;
       
-      const date = new Date(items[0].Date);
+      const date = new Date(sortedItems[0].Date);
       const dueDate = new Date(date);
       dueDate.setDate(date.getDate() + (settings?.dueDateDays || 15));
 
@@ -127,14 +142,14 @@ const App: React.FC = () => {
         id: bookingNo,
         bookingNo,
         customer: customerName,
-        date: items[0].Date,
+        date: sortedItems[0].Date,
         dueDate: dueDate.toISOString().split('T')[0],
         serialNumber: serialNum,
-        items,
-        total: items.reduce((sum, item) => sum + item.Rate, 0)
+        items: sortedItems,
+        total: sortedItems.reduce((sum, item) => sum + item.Rate, 0)
       } as Invoice;
     });
-  }, [bookings, customerSettings, invoiceOverrides]);
+  }, [bookings, customerSettings, invoiceOverrides, isGlobalMode, globalSerialStart, globalSerialPrefix]);
 
   const handleUpdateCustomer = (name: string, settings: CustomerSettings) => {
     setCustomerSettings(prev => ({ ...prev, [name]: settings }));

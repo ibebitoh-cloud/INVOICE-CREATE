@@ -52,7 +52,18 @@ export type InvoiceTheme =
   | 'blueprint'
   | 'retro'
   | 'minimalist-bold'
-  | 'executive';
+  | 'executive'
+  | 'brutalist'
+  | 'luxury'
+  | 'luxury-white'
+  | 'tech'
+  | 'editorial'
+  | 'organic'
+  | 'atmospheric'
+  | 'clean-utility'
+  | 'oversized'
+  | 'bold-color'
+  | 'split-layout';
 
 export interface Invoice {
   id: string;
