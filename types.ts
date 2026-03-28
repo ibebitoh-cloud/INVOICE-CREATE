@@ -63,7 +63,12 @@ export type InvoiceTheme =
   | 'clean-utility'
   | 'oversized'
   | 'bold-color'
-  | 'split-layout';
+  | 'split-layout'
+  | 'midnight-neon'
+  | 'minimal-emerald'
+  | 'technical-drawing'
+  | 'bauhaus-modern'
+  | 'deep-ocean';
 
 export interface Invoice {
   id: string;

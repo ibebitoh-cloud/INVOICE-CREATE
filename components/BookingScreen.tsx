@@ -33,13 +33,13 @@ interface Props {
   onImport: (data: BookingRow[]) => void;
   onClearAll: () => void;
   onLoadSample: () => void;
-  onAddBooking: (booking: BookingRow) => void;
+  onAddBookings: (bookings: BookingRow[]) => void;
   // We need company info and current theme for batch rendering
   company: CompanyInfo;
   theme: InvoiceTheme;
 }
 
-const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClearAll, onLoadSample, onAddBooking, company, theme }) => {
+const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClearAll, onLoadSample, onAddBookings, company, theme }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [usedInvoiceIds, setUsedInvoiceIds] = useState<Set<string>>(new Set());
   const [showStatementTool, setShowStatementTool] = useState(false);
@@ -74,13 +74,20 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
   const fileInputRef = useRef<HTMLInputElement>(null);
   const batchRenderRef = useRef<HTMLDivElement>(null);
 
-  const filtered = invoices.filter(inv => 
-    inv.bookingNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inv.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inv.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = invoices
+    .filter(inv => 
+      inv.bookingNo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inv.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inv.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return b.serialNumber.localeCompare(a.serialNumber);
+    });
 
-  const uniqueCustomers = useMemo(() => Array.from(new Set(invoices.map(inv => inv.customer))), [invoices]);
+  const uniqueCustomers = useMemo(() => Array.from(new Set(invoices.map(inv => inv.customer))).sort(), [invoices]);
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,7 +95,23 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
       alert("Customer and Booking Number are required.");
       return;
     }
-    onAddBooking(newBooking);
+
+    // Split unit numbers by newline, comma, or space
+    const units = newBooking.UnitNumber
+      .split(/[\n,]+/)
+      .map(u => u.trim())
+      .filter(u => u.length > 0);
+
+    // If no units provided, we still create one with empty unit number if that's what they want,
+    // but usually they should provide at least one.
+    const unitsToCreate = units.length > 0 ? units : [''];
+
+    const bookingsToAdd: BookingRow[] = unitsToCreate.map(unit => ({
+      ...newBooking,
+      UnitNumber: unit
+    }));
+
+    onAddBookings(bookingsToAdd);
     setShowAddModal(false);
     setNewBooking({
       Customer: '',
@@ -320,12 +343,15 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
                     onChange={(e) => setNewBooking({...newBooking, BookingNo: e.target.value})}
                   />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Container / Unit #</label>
-                  <input 
-                    type="text" 
-                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold"
-                    placeholder="e.g. MSKU-123456"
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest flex justify-between">
+                    <span>Container / Unit Numbers</span>
+                    <span className="text-[10px] text-emerald-600 lowercase font-bold">One per line or comma separated</span>
+                  </label>
+                  <textarea 
+                    rows={3}
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 font-bold resize-none"
+                    placeholder="e.g. MSKU-123456&#10;MSKU-789012"
                     value={newBooking.UnitNumber}
                     onChange={(e) => setNewBooking({...newBooking, UnitNumber: e.target.value})}
                   />

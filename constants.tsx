@@ -102,4 +102,9 @@ export const THEMES = [
   { id: 'oversized', name: 'Oversized Typographic' },
   { id: 'bold-color', name: 'Bold Background' },
   { id: 'split-layout', name: 'SaaS Split Layout' },
+  { id: 'midnight-neon', name: 'Midnight Neon' },
+  { id: 'minimal-emerald', name: 'Minimal Emerald' },
+  { id: 'technical-drawing', name: 'Technical Drawing' },
+  { id: 'bauhaus-modern', name: 'Bauhaus Modern' },
+  { id: 'deep-ocean', name: 'Deep Ocean' },
 ] as const;

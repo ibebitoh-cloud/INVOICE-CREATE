@@ -113,7 +113,7 @@ const App: React.FC = () => {
       return a[0].localeCompare(b[0]);
     });
 
-    return sortedGroups.map(([bookingNo, items], index) => {
+    const result = sortedGroups.map(([bookingNo, items], index) => {
       // Sort items within the invoice by date, then by unit number
       const sortedItems = [...items].sort((a, b) => {
         const dateA = new Date(a.Date).getTime();
@@ -149,6 +149,8 @@ const App: React.FC = () => {
         total: sortedItems.reduce((sum, item) => sum + item.Rate, 0)
       } as Invoice;
     });
+
+    return result.reverse();
   }, [bookings, customerSettings, invoiceOverrides, isGlobalMode, globalSerialStart, globalSerialPrefix]);
 
   const handleUpdateCustomer = (name: string, settings: CustomerSettings) => {
@@ -167,8 +169,8 @@ const App: React.FC = () => {
     setInvoiceOverrides({});
   };
 
-  const handleAddBooking = (newBooking: BookingRow) => {
-    const nextBookings = [...bookings, newBooking];
+  const handleAddBookings = (newBookings: BookingRow[]) => {
+    const nextBookings = [...bookings, ...newBookings];
     setBookings(nextBookings);
     updateCustomerSettings(nextBookings);
   };
@@ -246,7 +248,7 @@ const App: React.FC = () => {
               onPreview={(inv) => setSelectedInvoice(inv)}
               onImport={handleImportCSV}
               onClearAll={handleClearAll}
-              onAddBooking={handleAddBooking}
+              onAddBookings={handleAddBookings}
               onLoadSample={() => {
                 const parsed = parseCSV(INITIAL_CSV_DATA);
                 handleImportCSV(parsed);
