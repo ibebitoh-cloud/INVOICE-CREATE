@@ -26,13 +26,13 @@ const App: React.FC = () => {
   const [companyInfo, setCompanyInfo] = useState<CompanyInfo>({
     name: 'NILE FLEET',
     subName: 'GENSET',
-    address: '123 Cairo Logistics Hub, Nile Delta, Egypt',
-    email: 'billing@nilefleet.com',
-    phone: '+20 123 456 7890',
-    authName: 'Operations Manager',
-    authJobTitle: 'Head of Logistics',
-    authPhone: '+20 100 000 0000',
-    authEmail: 'ops@nilefleet.com',
+    address: 'PORTSAID, EGYPT',
+    email: '',
+    phone: '',
+    authName: 'MOHAMED ALAA',
+    authJobTitle: 'HEAD OF FINANCE',
+    authPhone: '+20 11 464 75759',
+    authEmail: 'mohamedalaa@nilefleetlogistics.com',
     logo: null,
     signature: null,
     watermark: null,
@@ -42,7 +42,7 @@ const App: React.FC = () => {
   });
   
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [selectedTheme, setSelectedTheme] = useState<InvoiceTheme>('minimal');
+  const [selectedTheme, setSelectedTheme] = useState<InvoiceTheme>('minimalist-bold');
   const [invoiceOverrides, setInvoiceOverrides] = useState<Record<string, string>>({});
   const [globalSerialStart, setGlobalSerialStart] = useState<string>('1000');
   const [globalSerialPrefix, setGlobalSerialPrefix] = useState<string>('INV-');
@@ -225,15 +225,19 @@ const App: React.FC = () => {
         </div>
 
         <div className="pt-8 border-t border-slate-800">
-          <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-4">Invoice Theme</p>
-          <div className="grid grid-cols-1 gap-2">
-            {THEMES.map(theme => (
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Invoice Theme</div>
+          <div className="space-y-2">
+            {THEMES.map((t) => (
               <button
-                key={theme.id}
-                onClick={() => setSelectedTheme(theme.id)}
-                className={`text-sm px-3 py-1.5 rounded border transition-all text-left ${selectedTheme === theme.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-slate-700 text-slate-400 hover:border-slate-500'}`}
+                key={t.id}
+                onClick={() => setSelectedTheme(t.id)}
+                className={`w-full text-left px-4 py-2 rounded-md text-sm transition-all ${
+                  selectedTheme === t.id 
+                    ? 'bg-white text-slate-900 font-bold shadow-lg' 
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
               >
-                {theme.name}
+                {t.name}
               </button>
             ))}
           </div>

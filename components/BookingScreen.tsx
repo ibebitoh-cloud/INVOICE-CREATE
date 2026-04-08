@@ -241,7 +241,10 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
           const shipperMatch = !statementForm.shipper || item.Shipper === statementForm.shipper;
           
           if (dateMatch && shipperMatch) {
-            allMatchingBookings.push(item);
+            allMatchingBookings.push({
+              ...item,
+              InvoiceNo: inv.serialNumber
+            });
           }
         });
       });

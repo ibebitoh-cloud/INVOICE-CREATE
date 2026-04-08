@@ -41,6 +41,10 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       case 'blueprint': return `bg-[#002b5c] text-[#a5c9ff] font-mono ${isCompact ? 'p-6' : 'p-10'}`;
       case 'retro': return `bg-[#f4ecd8] text-[#433422] font-['Special_Elite'] ${isCompact ? 'p-8' : 'p-12'}`;
       case 'minimalist-bold': return `bg-white text-black font-sans ${isCompact ? 'p-8' : 'p-12'}`;
+      case 'minimalist-dark': return `bg-black text-white font-sans ${isCompact ? 'p-8' : 'p-12'}`;
+      case 'minimalist-blue': return `bg-white text-slate-900 font-sans ${isCompact ? 'p-8' : 'p-12'}`;
+      case 'minimalist-emerald': return `bg-white text-slate-900 font-sans ${isCompact ? 'p-8' : 'p-12'}`;
+      case 'minimalist-modern': return `bg-white text-slate-900 font-sans ${isCompact ? 'p-8' : 'p-12'}`;
       case 'executive': return `bg-[#fcfcfc] text-[#1a1a1a] font-['Outfit'] ${isCompact ? 'p-8' : 'p-12'}`;
       case 'brutalist': return `bg-white text-black font-sans ${isCompact ? 'p-6' : 'p-10'} border-[12px] border-black`;
       case 'luxury': return `bg-[#0a0a0a] text-[#c5a059] font-serif ${isCompact ? 'p-8' : 'p-12'} border-t-[20px] border-[#c5a059]`;
@@ -57,7 +61,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     }
   };
 
-  const isDark = theme === 'dark';
+  const isDark = theme === 'dark' || theme === 'minimalist-dark';
   const titleText = invoice.isStatement ? 'STATEMENT OF ACCOUNT' : 'INVOICE';
   const periodLabel = invoice.isStatement ? 'Statement Period' : 'Booking Ref';
   const periodValue = invoice.isStatement ? invoice.period : invoice.bookingNo;
@@ -285,16 +289,25 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
           </div>
         );
       case 'minimalist-bold':
+      case 'minimalist-dark':
+      case 'minimalist-blue':
+      case 'minimalist-emerald':
+      case 'minimalist-modern':
+        const accentColor = theme === 'minimalist-blue' ? 'text-blue-600' : 
+                           theme === 'minimalist-emerald' ? 'text-emerald-600' : 
+                           theme === 'minimalist-dark' ? 'text-white' : 'text-black';
+        const subColor = theme === 'minimalist-dark' ? 'text-slate-500' : 'text-slate-400';
+        
         return (
           <div className={`flex justify-between items-end ${isVeryCompact ? 'mb-8' : 'mb-16'}`}>
             <div>
-              {company.logo && <img src={company.logo} className={`${isVeryCompact ? 'h-8 mb-4' : 'h-16 mb-8'} w-auto grayscale`} />}
-              <div className={`${isVeryCompact ? 'text-3xl' : 'text-6xl'} font-black leading-none tracking-tighter mb-2`}>{company.name}</div>
-              <div className="text-xs font-black uppercase tracking-[0.5em] text-slate-400">{company.subName}</div>
+              {company.logo && <img src={company.logo} className={`${isVeryCompact ? 'h-8 mb-4' : 'h-16 mb-8'} w-auto grayscale ${theme === 'minimalist-dark' ? 'invert brightness-200' : ''}`} />}
+              <div className={`${isVeryCompact ? 'text-3xl' : 'text-6xl'} font-black leading-none tracking-tighter mb-2 ${accentColor}`}>{company.name}</div>
+              <div className={`text-xs font-black uppercase tracking-[0.5em] ${subColor}`}>{company.subName}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs font-black uppercase tracking-widest mb-1">Invoice</div>
-              <div className={`${isVeryCompact ? 'text-2xl' : 'text-4xl'} font-black tracking-tighter`}>{invoice.serialNumber}</div>
+              <div className={`text-xs font-black uppercase tracking-widest mb-1 ${subColor}`}>Invoice</div>
+              <div className={`${isVeryCompact ? 'text-2xl' : 'text-4xl'} font-black tracking-tighter ${accentColor}`}>{invoice.serialNumber}</div>
             </div>
           </div>
         );
@@ -750,16 +763,30 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
           </div>
         );
       case 'minimalist-bold':
+      case 'minimalist-dark':
+      case 'minimalist-blue':
+      case 'minimalist-emerald':
+      case 'minimalist-modern':
+        const borderColor = theme === 'minimalist-blue' ? 'border-blue-600' : 
+                           theme === 'minimalist-emerald' ? 'text-emerald-600' : 
+                           theme === 'minimalist-dark' ? 'border-white' : 'border-black';
+        const labelColor = theme === 'minimalist-dark' ? 'text-slate-500' : 'text-slate-400';
+        const badgeBg = theme === 'minimalist-blue' ? 'bg-blue-600' :
+                        theme === 'minimalist-emerald' ? 'bg-emerald-600' :
+                        theme === 'minimalist-dark' ? 'bg-white text-black' : 'bg-black text-white';
+        const textColor = theme === 'minimalist-dark' ? 'text-white' : 'text-black';
+        const borderTop = theme === 'minimalist-modern' ? 'border-t-2' : 'border-t-8';
+
         return (
-          <div className={`${isVeryCompact ? 'mb-6 pt-4' : 'mb-12 pt-8'} border-t-8 border-black flex justify-between items-start`}>
+          <div className={`${isVeryCompact ? 'mb-6 pt-4' : 'mb-12 pt-8'} ${borderTop} ${borderColor} flex justify-between items-start`}>
             <div>
-              <div className="text-xs font-black uppercase tracking-widest mb-4">Client</div>
-              <div className={`${isVeryCompact ? 'text-2xl' : 'text-4xl'} font-black tracking-tighter`}>{invoice.customer}</div>
+              <div className={`text-xs font-black uppercase tracking-widest mb-4 ${labelColor}`}>Client</div>
+              <div className={`${isVeryCompact ? 'text-2xl' : 'text-4xl'} font-black tracking-tighter ${textColor}`}>{invoice.customer}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs font-black uppercase tracking-widest mb-2">Reference</div>
-              <div className={`${isVeryCompact ? 'text-lg' : 'text-xl'} font-black tracking-tighter`}>{periodValue}</div>
-              <div className={`mt-4 text-xs font-black bg-black text-white ${isVeryCompact ? 'px-2 py-0.5' : 'px-3 py-1'} uppercase tracking-widest`}>Due {invoice.dueDate}</div>
+              <div className={`text-xs font-black uppercase tracking-widest mb-2 ${labelColor}`}>Reference</div>
+              <div className={`${isVeryCompact ? 'text-lg' : 'text-xl'} font-black tracking-tighter ${textColor}`}>{periodValue}</div>
+              <div className={`mt-4 text-xs font-black ${badgeBg} ${isVeryCompact ? 'px-2 py-0.5' : 'px-3 py-1'} uppercase tracking-widest`}>Due {invoice.dueDate}</div>
             </div>
           </div>
         );
@@ -975,7 +1002,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
   const renderTable = () => {
     const groupedMap = new Map<string, any>();
     invoice.items.forEach(item => {
-      const key = `${item.Date}-${item.PortGo}-${item.PortGi}-${item.Shipper}-${item.Trucker}-${item.Rate}`;
+      const key = `${item.Date}-${item.PortGo}-${item.PortGi}-${item.Shipper}-${item.Trucker}-${item.Rate}-${item.InvoiceNo || ''}`;
       if (groupedMap.has(key)) {
         const existing = groupedMap.get(key);
         existing.UnitNumbers.push(item.UnitNumber);
@@ -1058,10 +1085,17 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       theadClass = "border-y border-[#433422]";
       thClass = `px-2 ${isCompact ? 'py-1' : 'py-2'} text-left font-bold text-[11px] uppercase`;
       tdClass = `px-2 ${isVeryCompact ? 'py-0.5' : (isCompact ? 'py-1' : 'py-3')} border-b border-[#433422]/10 ${isVeryCompact ? 'text-[11px]' : 'text-[13px]'}`;
-    } else if (theme === 'minimalist-bold') {
-      theadClass = "bg-black text-white";
+    } else if (theme === 'minimalist-bold' || theme === 'minimalist-dark' || theme === 'minimalist-blue' || theme === 'minimalist-emerald' || theme === 'minimalist-modern') {
+      const headerBg = theme === 'minimalist-blue' ? 'bg-blue-600' :
+                       theme === 'minimalist-emerald' ? 'bg-emerald-600' :
+                       theme === 'minimalist-dark' ? 'bg-white text-black' : 
+                       theme === 'minimalist-modern' ? 'bg-slate-50 text-black border-y-2 border-black' : 'bg-black text-white';
+      const borderCol = theme === 'minimalist-dark' ? 'border-slate-800' : 'border-slate-100';
+      const textCol = theme === 'minimalist-dark' ? 'text-white' : 'text-slate-900';
+      
+      theadClass = headerBg;
       thClass = `px-4 ${isCompact ? 'py-2' : 'py-4'} text-left font-black text-[10px] uppercase tracking-widest`;
-      tdClass = `px-4 ${isVeryCompact ? 'py-1' : (isCompact ? 'py-2' : 'py-4')} border-b-2 border-slate-100 ${isVeryCompact ? 'text-[11px]' : 'text-[13px]'} font-black`;
+      tdClass = `px-4 ${isVeryCompact ? 'py-1' : (isCompact ? 'py-2' : 'py-4')} border-b-2 ${borderCol} ${isVeryCompact ? 'text-[11px]' : 'text-[13px]'} font-black ${textCol}`;
     } else if (theme === 'executive') {
       theadClass = "bg-slate-50";
       thClass = `px-4 ${isCompact ? 'py-2' : 'py-4'} text-left font-bold text-[10px] uppercase tracking-[0.2em] text-slate-400`;
@@ -1117,12 +1151,13 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
         <table className="w-full border-collapse">
           <thead className={theadClass}>
             <tr>
-              <th className={`${thClass} w-[10%]`}>Date</th>
-              <th className={`${thClass} w-[25%]`}>Unit</th>
-              <th className={`${thClass} w-[18%]`}>Route</th>
-              <th className={`${thClass} w-[15%]`}>Shipper</th>
-              <th className={`${thClass} w-[15%]`}>Trucker</th>
-              <th className={`${thClass} text-right w-[17%]`}>Rate</th>
+              <th className={`${thClass} w-[8%]`}>Date</th>
+              {invoice.isStatement && <th className={`${thClass} w-[12%]`}>Invoice</th>}
+              <th className={`${thClass} ${invoice.isStatement ? 'w-[20%]' : 'w-[32%]'}`}>Unit</th>
+              <th className={`${thClass} w-[16%]`}>Route</th>
+              <th className={`${thClass} w-[14%]`}>Shipper</th>
+              <th className={`${thClass} w-[14%]`}>Trucker</th>
+              <th className={`${thClass} text-right w-[16%]`}>Rate</th>
             </tr>
           </thead>
           <tbody>
@@ -1133,8 +1168,18 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 <td className={tdClass}>
                    <div className="font-bold opacity-60">{item.Date}</div>
                 </td>
+                {invoice.isStatement && (
+                  <td className={tdClass}>
+                    <div className="font-black text-blue-600">{item.InvoiceNo || '-'}</div>
+                  </td>
+                )}
                 <td className={tdClass}>
-                  <div className={`font-black text-slate-900 leading-tight ${item.UnitNumbers.length > 5 ? 'grid grid-cols-2 gap-x-4' : 'flex flex-col'}`}>
+                  <div className={`font-black text-slate-900 leading-tight ${
+                    item.UnitNumbers.length > 12 ? 'grid grid-cols-4 gap-x-1 text-[8px]' :
+                    item.UnitNumbers.length > 8 ? 'grid grid-cols-3 gap-x-2 text-[9px]' : 
+                    item.UnitNumbers.length > 4 ? 'grid grid-cols-2 gap-x-4 text-[11px]' : 
+                    'flex flex-col'
+                  }`}>
                     {item.UnitNumbers.map((unit, idx) => (
                       <div key={idx} className="whitespace-nowrap">{unit}</div>
                     ))}
@@ -1179,22 +1224,30 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
     const authAndSignature = (
       <div className={`flex items-end ${isVeryCompact ? 'gap-2' : (isCompact ? 'gap-4' : 'gap-10')}`}>
-        <div className={`flex flex-col justify-end border-l-4 ${isVeryCompact ? 'pl-2' : (isCompact ? 'pl-3' : 'pl-5')} ${isDark ? 'border-blue-500' : 'border-slate-900'}`}>
-          <div className={`${isVeryCompact ? 'text-sm' : (isCompact ? 'text-lg' : 'text-2xl')} font-black tracking-tight leading-none uppercase mb-1`}>{company.authName}</div>
-          <div className={`${isVeryCompact ? 'text-[8px]' : 'text-[10px]'} font-black text-blue-600 uppercase tracking-widest ${isVeryCompact ? 'mb-2' : 'mb-4'}`}>{company.authJobTitle}</div>
+        <div className={`flex flex-col justify-end border-l-4 ${isVeryCompact ? 'pl-2' : (isCompact ? 'pl-3' : 'pl-5')} ${
+          theme === 'minimalist-blue' ? 'border-blue-600' :
+          theme === 'minimalist-emerald' ? 'border-emerald-600' :
+          isDark ? 'border-blue-500' : 'border-slate-900'
+        }`}>
+          <div className={`${isVeryCompact ? 'text-sm' : (isCompact ? 'text-lg' : 'text-2xl')} font-black tracking-tight leading-none uppercase mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{company.authName}</div>
+          <div className={`${isVeryCompact ? 'text-[8px]' : 'text-[10px]'} font-black ${
+            theme === 'minimalist-blue' ? 'text-blue-600' :
+            theme === 'minimalist-emerald' ? 'text-emerald-600' :
+            'text-blue-600'
+          } uppercase tracking-widest ${isVeryCompact ? 'mb-2' : 'mb-4'}`}>{company.authJobTitle}</div>
           
           <div className={`space-y-1 ${isVeryCompact ? 'text-[7px]' : 'text-[8px]'} font-bold text-slate-400 uppercase leading-none`}>
             <div className="flex items-center gap-2">
               <span className={`${isVeryCompact ? 'min-w-[24px]' : 'min-w-[32px]'} opacity-40`}>LOC:</span>
-              <span className="text-slate-600">{company.address}</span>
+              <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{company.address}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className={`${isVeryCompact ? 'min-w-[24px]' : 'min-w-[32px]'} opacity-40`}>MAIL:</span>
-              <span className="text-slate-600 lowercase">{company.authEmail || company.email}</span>
+              <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'} lowercase`}>{company.authEmail || company.email}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className={`${isVeryCompact ? 'min-w-[24px]' : 'min-w-[32px]'} opacity-40`}>MOB:</span>
-              <span className="text-slate-600">{company.authPhone || company.phone}</span>
+              <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{company.authPhone || company.phone}</span>
             </div>
           </div>
         </div>
@@ -1215,9 +1268,15 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     );
 
     const settlementSection = (
-      <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
-         <h5 className="text-[9px] font-black uppercase text-blue-600 tracking-widest mb-2">Settlement Mandate</h5>
-         <p className="text-[10.5px] leading-relaxed text-slate-500 font-medium">
+      <div className={`p-4 rounded-xl border ${
+        isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-100'
+      }`}>
+         <h5 className={`text-[9px] font-black uppercase tracking-widest mb-2 ${
+           theme === 'minimalist-blue' ? 'text-blue-600' :
+           theme === 'minimalist-emerald' ? 'text-emerald-600' :
+           'text-blue-600'
+         }`}>Settlement Mandate</h5>
+         <p className={`text-[10.5px] leading-relaxed font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {settlementText}
          </p>
       </div>
@@ -1250,9 +1309,17 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     );
 
     const minimalistTotal = (
-      <div className={`border-y-8 border-black ${isVeryCompact ? 'py-2' : (isCompact ? 'py-4' : 'py-8')} flex justify-between items-center w-full`}>
-        <div className={`${isVeryCompact ? 'text-base' : (isCompact ? 'text-lg' : 'text-2xl')} font-black uppercase tracking-widest`}>Total</div>
-        <div className={`${isVeryCompact ? 'text-3xl' : (isCompact ? 'text-5xl' : 'text-7xl')} font-black tracking-tighter`}>{invoice.total.toLocaleString()}</div>
+      <div className={`${theme === 'minimalist-modern' ? 'border-y-2' : 'border-y-8'} ${
+        theme === 'minimalist-blue' ? 'border-blue-600' :
+        theme === 'minimalist-emerald' ? 'border-emerald-600' :
+        theme === 'minimalist-dark' ? 'border-white' : 'border-black'
+      } ${isVeryCompact ? 'py-2' : (isCompact ? 'py-4' : 'py-8')} flex justify-between items-center w-full`}>
+        <div className={`${isVeryCompact ? 'text-base' : (isCompact ? 'text-lg' : 'text-2xl')} font-black uppercase tracking-widest ${theme === 'minimalist-dark' ? 'text-white' : 'text-black'}`}>Total</div>
+        <div className={`${isVeryCompact ? 'text-3xl' : (isCompact ? 'text-5xl' : 'text-7xl')} font-black tracking-tighter ${
+          theme === 'minimalist-blue' ? 'text-blue-600' :
+          theme === 'minimalist-emerald' ? 'text-emerald-600' :
+          theme === 'minimalist-dark' ? 'text-white' : 'text-black'
+        }`}>{invoice.total.toLocaleString()}</div>
       </div>
     );
 
@@ -1645,6 +1712,10 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
           </div>
         );
       case 'minimalist-bold':
+      case 'minimalist-dark':
+      case 'minimalist-blue':
+      case 'minimalist-emerald':
+      case 'minimalist-modern':
         return (
           <div className={`mt-auto ${isVeryCompact ? 'pt-3' : (isCompact ? 'pt-6' : 'pt-12')} flex flex-col`}>
             <div className={isVeryCompact ? 'mb-3' : (isCompact ? 'mb-6' : 'mb-12')}>{minimalistTotal}</div>

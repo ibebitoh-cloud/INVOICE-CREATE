@@ -8,6 +8,7 @@ export interface BookingRow {
   Shipper: string;
   Rate: number;
   Date: string;
+  InvoiceNo?: string;
 }
 
 export interface CustomerSettings {
@@ -37,38 +38,11 @@ export interface CompanyInfo {
 }
 
 export type InvoiceTheme = 
-  | 'minimal' 
-  | 'corporate' 
-  | 'elegant' 
-  | 'modern-serif'
-  | 'ledger-pro'
-  | 'bold' 
-  | 'dark' 
-  | 'grid' 
-  | 'classic' 
-  | 'soft' 
-  | 'industrial' 
-  | 'compact'
-  | 'blueprint'
-  | 'retro'
   | 'minimalist-bold'
-  | 'executive'
-  | 'brutalist'
-  | 'luxury'
-  | 'luxury-white'
-  | 'tech'
-  | 'editorial'
-  | 'organic'
-  | 'atmospheric'
-  | 'clean-utility'
-  | 'oversized'
-  | 'bold-color'
-  | 'split-layout'
-  | 'midnight-neon'
-  | 'minimal-emerald'
-  | 'technical-drawing'
-  | 'bauhaus-modern'
-  | 'deep-ocean';
+  | 'minimalist-dark'
+  | 'minimalist-blue'
+  | 'minimalist-emerald'
+  | 'minimalist-modern';
 
 export interface Invoice {
   id: string;
