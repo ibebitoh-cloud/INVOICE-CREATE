@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Printer, Download, Loader2, Edit3, Check } from 'lucide-react';
 import { Invoice, InvoiceTheme, CompanyInfo } from '../types.ts';
 import InvoiceRenderer from './InvoiceRenderer.tsx';
@@ -79,19 +80,19 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onUpdateSerial
       const imgProps = pdf.getImageProperties(imgData);
       const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
       
-      let heightLeft = imgHeight;
-      let position = 0;
-
       // Add the first page
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
-      heightLeft -= pdfHeight;
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, imgHeight, undefined, 'FAST');
+      
+      // Only add subsequent pages if the content is significantly longer than one page
+      // (Using a 5mm buffer to prevent ghost pages from rounding errors)
+      let heightLeft = imgHeight - pdfHeight;
+      let position = -pdfHeight;
 
-      // Add subsequent pages if needed
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
+      while (heightLeft > 5) {
         pdf.addPage();
         pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight, undefined, 'FAST');
         heightLeft -= pdfHeight;
+        position -= pdfHeight;
       }
       
       const safeCustomer = invoice.customer.replace(/[^a-z0-9]/gi, '_');
@@ -216,12 +217,14 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onUpdateSerial
       </div>
 
       {/* 
-        NATIVE PRINT SOURCE - This div is invisible on screen but 
-        is the primary target for window.print()
+        NATIVE PRINT SOURCE - Moved outside #root via Portal for reliable printing
       */}
-      <div className="print-only">
-        <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
-      </div>
+      {createPortal(
+        <div className="print-only">
+          <InvoiceRenderer invoice={invoice} theme={theme} company={company} />
+        </div>,
+        document.body
+      )}
 
       {/* 
         PDF CAPTURE SOURCE - Off-screen high quality element for html2canvas.
@@ -235,7 +238,9 @@ const InvoiceModal: React.FC<Props> = ({ invoice, theme, company, onUpdateSerial
           minHeight: '297mm', 
           position: 'absolute', 
           left: '-9999px', 
-          top: 0 
+          top: 0,
+          padding: 0,
+          margin: 0
         }}
       >
         <InvoiceRenderer invoice={invoice} theme={theme} company={company} />

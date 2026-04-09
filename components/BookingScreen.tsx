@@ -68,7 +68,12 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
     customer: '',
     shipper: '',
     dateFrom: '',
-    dateTo: ''
+    dateTo: '',
+    bookingNo: '',
+    unitNumber: '',
+    portGo: '',
+    portGi: '',
+    trucker: ''
   });
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -239,8 +244,13 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
           
           const dateMatch = (!from || itemDate >= from) && (!to || itemDate <= to);
           const shipperMatch = !statementForm.shipper || item.Shipper === statementForm.shipper;
+          const bookingMatch = !statementForm.bookingNo || item.BookingNo.toLowerCase().includes(statementForm.bookingNo.toLowerCase());
+          const unitMatch = !statementForm.unitNumber || item.UnitNumber.toLowerCase().includes(statementForm.unitNumber.toLowerCase());
+          const portGoMatch = !statementForm.portGo || item.PortGo.toLowerCase().includes(statementForm.portGo.toLowerCase());
+          const portGiMatch = !statementForm.portGi || item.PortGi.toLowerCase().includes(statementForm.portGi.toLowerCase());
+          const truckerMatch = !statementForm.trucker || item.Trucker.toLowerCase().includes(statementForm.trucker.toLowerCase());
           
-          if (dateMatch && shipperMatch) {
+          if (dateMatch && shipperMatch && bookingMatch && unitMatch && portGoMatch && portGiMatch && truckerMatch) {
             allMatchingBookings.push({
               ...item,
               InvoiceNo: inv.serialNumber
@@ -256,7 +266,15 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
 
     const datePart = `${statementForm.dateFrom || 'Start'} to ${statementForm.dateTo || 'End'}`;
     const shipperPart = statementForm.shipper ? ` | Shipper: ${statementForm.shipper}` : '';
-    const statementPeriod = `${datePart}${shipperPart}`;
+    const otherFilters = [
+      statementForm.bookingNo && `Booking: ${statementForm.bookingNo}`,
+      statementForm.unitNumber && `Unit: ${statementForm.unitNumber}`,
+      statementForm.portGo && `From: ${statementForm.portGo}`,
+      statementForm.portGi && `To: ${statementForm.portGi}`,
+      statementForm.trucker && `Trucker: ${statementForm.trucker}`
+    ].filter(Boolean).join(' | ');
+    
+    const statementPeriod = `${datePart}${shipperPart}${otherFilters ? ` | ${otherFilters}` : ''}`;
     
     const statementInvoice: Invoice = {
       id: `statement-${statementForm.customer}-${Date.now()}`,
@@ -632,7 +650,7 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4 items-end">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Customer</label>
               <select 
@@ -677,14 +695,82 @@ const BookingScreen: React.FC<Props> = ({ invoices, onPreview, onImport, onClear
                 onChange={(e) => setStatementForm({...statementForm, dateTo: e.target.value})}
               />
             </div>
-            <button 
-              onClick={generateStatement}
-              disabled={!statementForm.customer}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2"
-            >
-              <span>Preview SOA</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Booking No</label>
+              <input 
+                type="text"
+                placeholder="Search booking..."
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={statementForm.bookingNo}
+                onChange={(e) => setStatementForm({...statementForm, bookingNo: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Unit Number</label>
+              <input 
+                type="text"
+                placeholder="Search unit..."
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={statementForm.unitNumber}
+                onChange={(e) => setStatementForm({...statementForm, unitNumber: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Port Out (Go)</label>
+              <input 
+                type="text"
+                placeholder="Search port..."
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={statementForm.portGo}
+                onChange={(e) => setStatementForm({...statementForm, portGo: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Port In (Gi)</label>
+              <input 
+                type="text"
+                placeholder="Search port..."
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={statementForm.portGi}
+                onChange={(e) => setStatementForm({...statementForm, portGi: e.target.value})}
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Trucker</label>
+              <input 
+                type="text"
+                placeholder="Search trucker..."
+                className="w-full bg-white border border-blue-200 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                value={statementForm.trucker}
+                onChange={(e) => setStatementForm({...statementForm, trucker: e.target.value})}
+              />
+            </div>
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setStatementForm({
+                  customer: '',
+                  shipper: '',
+                  dateFrom: '',
+                  dateTo: '',
+                  bookingNo: '',
+                  unitNumber: '',
+                  portGo: '',
+                  portGi: '',
+                  trucker: ''
+                })}
+                className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-lg transition-colors text-sm"
+              >
+                Clear
+              </button>
+              <button 
+                onClick={generateStatement}
+                disabled={!statementForm.customer}
+                className="flex-[2] bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-bold py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+              >
+                <span>Preview SOA</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}

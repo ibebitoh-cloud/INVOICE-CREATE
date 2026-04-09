@@ -81,7 +81,7 @@ const App: React.FC = () => {
         if (!next[c]) {
           next[c] = {
             name: c,
-            dueDateDays: 15,
+            dueDateDays: 30,
             serialPrefix: 'INV-2026-',
             startingSerial: 100 + Object.keys(next).length
           };
@@ -136,7 +136,7 @@ const App: React.FC = () => {
       
       const date = new Date(sortedItems[0].Date);
       const dueDate = new Date(date);
-      dueDate.setDate(date.getDate() + (settings?.dueDateDays || 15));
+      dueDate.setDate(date.getDate() + (settings?.dueDateDays || 30));
 
       return {
         id: bookingNo,
