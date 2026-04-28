@@ -1009,7 +1009,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
   const renderTable = () => {
     const groupedMap = new Map<string, any>();
     invoice.items.forEach(item => {
-      const key = `${item.Date}-${item.PortGo}-${item.PortGi}-${item.Shipper}-${item.Trucker}-${item.Rate}-${item.InvoiceNo || ''}`;
+      const key = `${item.Date}-${item.PortGo}-${item.PortGi}-${item.Shipper}-${item.Trucker}-${item.Rate}-${item.InvoiceNo || ''}-${item.BookingNo || ''}`;
       if (groupedMap.has(key)) {
         const existing = groupedMap.get(key);
         existing.UnitNumbers.push(item.UnitNumber);
@@ -1158,13 +1158,14 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
         <table className="w-full border-collapse">
           <thead className={theadClass}>
             <tr>
-              <th className={`${thClass} w-[10%] min-w-[60px]`}>Date</th>
-              {invoice.isStatement && <th className={`${thClass} w-[12%] min-w-[80px]`}>Invoice</th>}
-              <th className={`${thClass} ${invoice.isStatement ? 'w-[26%]' : 'w-[30%]'} min-w-[120px]`}>Unit</th>
-              <th className={`${thClass} w-[13%] min-w-[100px]`}>Route</th>
+              <th className={`${thClass} w-[8%] min-w-[60px]`}>Date</th>
+              {invoice.isStatement && <th className={`${thClass} w-[10%] min-w-[80px]`}>Inv No</th>}
+              {invoice.isStatement && <th className={`${thClass} w-[12%] min-w-[90px]`}>Booking</th>}
+              <th className={`${thClass} ${invoice.isStatement ? 'w-[18%]' : 'w-[30%]'} min-w-[120px]`}>Unit</th>
+              <th className={`${thClass} w-[12%] min-w-[100px]`}>Route</th>
               <th className={`${thClass} w-[11%] min-w-[80px]`}>Shipper</th>
               <th className={`${thClass} w-[11%] min-w-[80px]`}>Trucker</th>
-              <th className={`${thClass} text-right w-[17%] min-w-[80px]`}>Rate</th>
+              <th className={`${thClass} text-right w-[18%] min-w-[80px]`}>Rate</th>
             </tr>
           </thead>
           <tbody>
@@ -1178,6 +1179,11 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 {invoice.isStatement && (
                   <td className={tdClass}>
                     <div className="font-black text-blue-600">{item.InvoiceNo || '-'}</div>
+                  </td>
+                )}
+                {invoice.isStatement && (
+                  <td className={tdClass}>
+                    <div className="font-black text-slate-700">{item.BookingNo || '-'}</div>
                   </td>
                 )}
                 <td className={tdClass}>
