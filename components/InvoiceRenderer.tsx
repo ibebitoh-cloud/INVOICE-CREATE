@@ -73,6 +73,34 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
   const periodLabel = invoice.isStatement ? 'Statement Period' : 'Booking Ref';
   const periodValue = invoice.isStatement ? invoice.period : invoice.bookingNo;
 
+  const renderStatementSummary = () => {
+    if (!invoice.isStatement) return null;
+    
+    return (
+      <div className="mb-8">
+        <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+          <div className="h-px bg-slate-200 flex-1"></div>
+          <span>Statement Overview</span>
+          <div className="h-px bg-slate-200 flex-1"></div>
+        </div>
+        <div className={`grid grid-cols-3 gap-4`}>
+          <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Bookings</div>
+            <div className="text-xl font-black text-slate-900">{invoice.items.length}</div>
+          </div>
+          <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Period Total</div>
+            <div className="text-xl font-black text-blue-600">{invoice.total.toLocaleString()} <span className="text-xs opacity-50">EGP</span></div>
+          </div>
+          <div className={`p-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'} border-l-4 border-l-blue-600`}>
+            <div className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Net Balance</div>
+            <div className="text-xl font-black text-slate-900">{invoice.total.toLocaleString()} <span className="text-xs opacity-50 font-normal">EGP</span></div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Updated Settlement Instructions with "final after a week" clause
   const settlementText = `Official payment is required before ${invoice.dueDate}. Direct transfers to Nile Fleet are mandatory. Document reference ${invoice.serialNumber} must be quoted in all remittance details for successful verification. After receiving the booking within a week, the invoice is final if no edits are required from your side.`;
 
@@ -1154,8 +1182,12 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     }
 
     if (invoice.isStatement) {
-      tdClass = tdClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[11px]';
-      thClass = thClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[10px]';
+      tdClass = tdClass.split(' ').filter(c => !c.startsWith('text-')).length > 0 
+        ? tdClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[11px] border-x border-slate-100' 
+        : 'text-[11px] border-x border-slate-100 px-2 py-2';
+      thClass = thClass.split(' ').filter(c => !c.startsWith('text-')).length > 0
+        ? thClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[10px] border-x border-slate-200 px-4 py-2'
+        : 'text-[10px] border-x border-slate-200 px-4 py-2';
     }
 
     return (
@@ -1312,10 +1344,13 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       </div>
     );
 
-    const totalSection = (
+  const totalLabel = invoice.isStatement ? 'Statement Closing Balance' : 'Total Payable Balance';
+  const totalAmountLabel = invoice.isStatement ? 'Statement Balance Due' : 'Total Amount Due';
+
+  const totalSection = (
       <div className={`bg-slate-900 text-white ${isVeryCompact ? 'p-2' : (isCompact ? 'p-4' : 'p-6')} rounded-[1.5rem] flex justify-between items-center w-full shadow-xl shadow-slate-900/10`}>
          <div>
-            <div className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 mb-0.5">Total Payable Balance</div>
+            <div className="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 mb-0.5">{totalLabel}</div>
             <div className="text-[10px] font-bold italic opacity-60">Egyptian Pounds (EGP)</div>
          </div>
          <div className={`${isVeryCompact ? 'text-2xl' : (isCompact ? 'text-3xl' : 'text-5xl')} font-black tabular-nums tracking-tighter`}>
@@ -1326,14 +1361,14 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
     const blueprintTotal = (
       <div className={`border-4 border-[#a5c9ff] ${isVeryCompact ? 'p-2' : (isCompact ? 'p-3' : 'p-6')} flex justify-between items-center w-full`}>
-        <div className={`${isVeryCompact ? 'text-xs' : (isCompact ? 'text-sm' : 'text-xl')} font-bold uppercase tracking-[0.2em]`}>TOTAL_PAYABLE_EGP</div>
+        <div className={`${isVeryCompact ? 'text-xs' : (isCompact ? 'text-sm' : 'text-xl')} font-bold uppercase tracking-[0.2em]`}>{invoice.isStatement ? 'STATEMENT_BALANCE_EGP' : 'TOTAL_PAYABLE_EGP'}</div>
         <div className={`${isVeryCompact ? 'text-2xl' : (isCompact ? 'text-4xl' : 'text-6xl')} font-bold tracking-tighter`}>{invoice.total.toLocaleString()}</div>
       </div>
     );
 
     const retroTotal = (
       <div className={`border-2 border-[#433422] ${isExtremeCompact ? 'p-1' : (isVeryCompact ? 'p-2' : (isCompact ? 'p-3' : 'p-6'))} flex justify-between items-center w-full bg-[#433422]/5`}>
-        <div className={`${isExtremeCompact ? 'text-[10px]' : (isVeryCompact ? 'text-xs' : (isCompact ? 'text-sm' : 'text-xl'))} font-bold uppercase underline`}>Total Amount Due:</div>
+        <div className={`${isExtremeCompact ? 'text-[10px]' : (isVeryCompact ? 'text-xs' : (isCompact ? 'text-sm' : 'text-xl'))} font-bold uppercase underline`}>{totalAmountLabel}:</div>
         <div className={`${isExtremeCompact ? 'text-xl' : (isVeryCompact ? 'text-2xl' : (isCompact ? 'text-3xl' : 'text-5xl'))} font-bold`}>{invoice.total.toLocaleString()} EGP</div>
       </div>
     );
@@ -1356,8 +1391,8 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     const executiveTotal = (
       <div className={`bg-[#1a1a1a] text-white ${isVeryCompact ? 'p-4' : (isCompact ? 'p-6' : 'p-10')} flex justify-between items-center w-full`}>
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-400 mb-2">Final Settlement Amount</div>
-          <div className="text-sm font-medium text-white/40 italic">All values in Egyptian Pounds</div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-400 mb-2">{invoice.isStatement ? 'Final Statement Balance' : 'Final Settlement Amount'}</div>
+          <div className="text-sm font-medium text-white/40 italic text-center">All values in Egyptian Pounds</div>
         </div>
         <div className={`${isVeryCompact ? 'text-2xl' : (isCompact ? 'text-4xl' : 'text-6xl')} font-black tracking-tighter text-amber-400`}>
           {invoice.total.toLocaleString()}
@@ -1375,8 +1410,8 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
     const luxuryTotal = (
       <div className={`border border-[#c5a059] ${isVeryCompact ? 'p-4' : (isCompact ? 'p-6' : 'p-10')} flex justify-between items-center w-full bg-[#c5a059]/5`}>
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.5em] text-[#c5a059] mb-2">Total Amount Due</div>
-          <div className="text-sm font-light italic text-white/40">Egyptian Pounds (EGP)</div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.5em] text-[#c5a059] mb-2">{totalAmountLabel}</div>
+          <div className="text-sm font-light italic text-white/40 text-center">Egyptian Pounds (EGP)</div>
         </div>
         <div className={`${isVeryCompact ? 'text-3xl' : (isCompact ? 'text-5xl' : 'text-7xl')} font-light tracking-tighter text-[#c5a059]`}>
           {invoice.total.toLocaleString()}
@@ -2011,6 +2046,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
 
       {renderHeader()}
       {renderBillTo()}
+      {renderStatementSummary()}
       <div className="flex-1 min-h-0">
         {renderTable()}
       </div>
