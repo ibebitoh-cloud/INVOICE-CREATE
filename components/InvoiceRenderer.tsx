@@ -1153,6 +1153,11 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
       tdClass = `px-6 ${isVeryCompact ? 'py-1' : (isCompact ? 'py-2' : 'py-5')} border-b border-slate-100 ${isVeryCompact ? 'text-[11px]' : 'text-[13px]'} font-bold text-slate-700`;
     }
 
+    if (invoice.isStatement) {
+      tdClass = tdClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[11px]';
+      thClass = thClass.split(' ').filter(c => !c.startsWith('text-')).join(' ') + ' text-[10px]';
+    }
+
     return (
       <div className={`${isVeryCompact ? 'mb-2' : (isCompact ? 'mb-4' : 'mb-8')} flex-1`}>
         <table className="w-full border-collapse">
@@ -1189,10 +1194,10 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 <td className={tdClass}>
                   <div className={`font-black text-slate-900 leading-tight ${
                     invoice.isStatement ? (
-                      item.UnitNumbers.length > 12 ? 'grid grid-cols-3 gap-x-1 text-[10px]' :
-                      item.UnitNumbers.length > 8 ? 'grid grid-cols-2 gap-x-2 text-[11px]' : 
-                      item.UnitNumbers.length > 4 ? 'grid grid-cols-1 gap-x-4 text-[12px]' : 
-                      'flex flex-col text-[13px]'
+                      item.UnitNumbers.length > 12 ? 'grid grid-cols-3 gap-x-1' :
+                      item.UnitNumbers.length > 8 ? 'grid grid-cols-2 gap-x-2' : 
+                      item.UnitNumbers.length > 4 ? 'grid grid-cols-1' : 
+                      'flex flex-col'
                     ) : (
                       item.UnitNumbers.length > 12 ? 'grid grid-cols-4 gap-x-1 text-[8px]' :
                       item.UnitNumbers.length > 8 ? 'grid grid-cols-3 gap-x-2 text-[9px]' : 
@@ -1208,7 +1213,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 <td className={tdClass}>
                    <div className="flex items-center gap-1 min-w-0 flex-wrap">
                       <span className="font-bold opacity-50">{item.PortGo}</span>
-                      <span className="text-blue-500 text-[9px] font-black shrink-0">→</span>
+                      <span className={`text-blue-500 font-black shrink-0 ${invoice.isStatement ? '' : 'text-[9px]'}`}>→</span>
                       <span className="font-bold text-slate-900">{item.PortGi}</span>
                    </div>
                 </td>
@@ -1221,11 +1226,11 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
                 <td className={`${tdClass} text-right font-black text-slate-900`}>
                   {item.Count > 1 ? (
                     <div className="flex flex-col items-end">
-                      <div className="text-[9px] opacity-40 font-bold">{item.Count} x {item.Rate.toLocaleString()}</div>
-                      <div>{item.TotalRate.toLocaleString()} <span className="text-[9px] font-bold opacity-30">EGP</span></div>
+                      <div className={`opacity-40 font-bold ${invoice.isStatement ? '' : 'text-[9px]'}`}>{item.Count} x {item.Rate.toLocaleString()}</div>
+                      <div>{item.TotalRate.toLocaleString()} <span className={`font-bold opacity-30 ${invoice.isStatement ? '' : 'text-[9px]'}`}>EGP</span></div>
                     </div>
                   ) : (
-                    <div>{item.Rate.toLocaleString()} <span className="text-[9px] font-bold opacity-30">EGP</span></div>
+                    <div>{item.Rate.toLocaleString()} <span className={`font-bold opacity-30 ${invoice.isStatement ? '' : 'text-[9px]'}`}>EGP</span></div>
                   )}
                 </td>
               </tr>
@@ -1255,13 +1260,13 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
             'text-blue-600'
           }`}>Authorized Signatory</h5>
           <div className={`${isVeryCompact ? 'text-sm' : (isCompact ? 'text-lg' : 'text-2xl')} font-black tracking-tight leading-none uppercase mb-1 ${isDark ? 'text-white' : 'text-slate-900'}`}>{company.authName}</div>
-          <div className={`${isExtremeCompact ? 'text-[7px]' : (isVeryCompact ? 'text-[8px]' : 'text-[10px]')} font-black ${
+          <div className={`${invoice.isStatement ? 'text-[10px]' : (isExtremeCompact ? 'text-[7px]' : (isVeryCompact ? 'text-[8px]' : 'text-[10px]'))} font-black ${
             theme === 'minimalist-blue' ? 'text-blue-600' :
             theme === 'minimalist-emerald' ? 'text-emerald-600' :
             'text-blue-600'
           } uppercase tracking-widest ${isExtremeCompact ? 'mb-1' : (isVeryCompact ? 'mb-2' : 'mb-4')}`}>{company.authJobTitle}</div>
           
-          <div className={`space-y-1 ${isExtremeCompact ? 'text-[6px]' : (isVeryCompact ? 'text-[7px]' : 'text-[8px]')} font-bold text-slate-400 uppercase leading-none`}>
+          <div className={`space-y-1 ${invoice.isStatement ? 'text-[8px]' : (isExtremeCompact ? 'text-[6px]' : (isVeryCompact ? 'text-[7px]' : 'text-[8px]'))} font-bold text-slate-400 uppercase leading-none`}>
             <div className="flex items-center gap-2">
               <span className={`${isVeryCompact ? 'min-w-[24px]' : 'min-w-[32px]'} opacity-40`}>LOC:</span>
               <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{company.address}</span>
@@ -1301,7 +1306,7 @@ const InvoiceRenderer: React.FC<Props> = ({ invoice, theme, company }) => {
            theme === 'minimalist-emerald' ? 'text-emerald-600' :
            'text-blue-600'
          }`}>Settlement Mandate</h5>
-         <p className={`${isExtremeCompact ? 'text-[9px]' : 'text-[10.5px]'} leading-relaxed font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+         <p className={`${invoice.isStatement ? 'text-[11px]' : (isExtremeCompact ? 'text-[9px]' : 'text-[10.5px]')} leading-relaxed font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
             {settlementText}
          </p>
       </div>
